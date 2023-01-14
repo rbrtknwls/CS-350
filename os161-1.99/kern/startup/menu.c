@@ -396,6 +396,16 @@ cmd_kheapstats(int nargs, char **args)
 	return 0;
 }
 
+static
+int
+cmd_dth(int nargs, char **args)
+{
+        (void)nargs;
+        (void)args;
+
+        return 0;
+}
+
 ////////////////////////////////////////
 //
 // Menus.
@@ -549,6 +559,7 @@ static struct {
 	{ "q",		cmd_quit },
 	{ "exit",	cmd_quit },
 	{ "halt",	cmd_quit },
+        { "dth",        cmd_dth },
 
 #if OPT_SYNCHPROBS
 	/* in-kernel synchronization problem(s) */
