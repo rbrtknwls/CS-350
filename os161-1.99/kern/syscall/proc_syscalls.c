@@ -61,6 +61,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    trapframe_for_child = &tf;
+   
    as_copy(curproc_getas(), child->p_addrspace);
 
    thread_fork("child_thread",
