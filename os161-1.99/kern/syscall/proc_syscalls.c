@@ -68,7 +68,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
                child,
                enter_forked_process(trapframe_for_child, 0),
                NULL,
-               NULL);
+               0);
 
    *retval = child->p_pid;
 
