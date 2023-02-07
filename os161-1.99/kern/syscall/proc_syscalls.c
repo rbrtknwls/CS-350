@@ -66,8 +66,8 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    thread_fork("child_thread",
                child,
-               enter_forked_process(trapframe_for_child, 0),
-               NULL,
+               enter_forked_process,
+               trapframe_for_child,
                0);
 
    *retval = child->p_pid;
