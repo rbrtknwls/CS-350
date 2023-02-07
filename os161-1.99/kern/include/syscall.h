@@ -66,7 +66,7 @@ int sys_waitpid(pid_t pid, userptr_t status, int options, pid_t *retval);
 
 #ifdef OPT_A1
 void enter_forked_process(struct trapframe *tf, long value2);
-int sys_fork(pid_t *retval, struct trapframe tf);
+int sys_fork(pid_t *retval, struct trapframe *tf);
 #else
 void enter_forked_process(struct trapframe *tf);
 #endif

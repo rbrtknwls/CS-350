@@ -54,10 +54,12 @@ void sys__exit(int exitcode) {
 
 #ifdef OPT_A1
 int
-sys_fork(pid_t *retval, struct trapframe *tf)
+sys_fork(pid_t *retval, struct trapframe *tf);
 {
    struct proc *child = proc_create_runprogram("child");
-   struct trapframe trapframe_for_child = kmalloc(sizeof(struct trapframe));
+   struct trapframe trapframe_for_child;
+
+   trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    trapframe_for_child = &tf;
    as_copy(curproc_getas(), child->p_addrspace);
