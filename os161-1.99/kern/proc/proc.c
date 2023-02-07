@@ -41,6 +41,7 @@
  * Unless you're implementing multithreaded user processes, the only
  * process that will have more than one thread is the kernel process.
  */
+#include "opt-A1.h"
 
 #include <types.h>
 #include <proc.h>
@@ -49,7 +50,8 @@
 #include <vnode.h>
 #include <vfs.h>
 #include <synch.h>
-#include <kern/fcntl.h>  
+#include <kern/fcntl.h>
+#include <limits.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -66,10 +68,13 @@ static volatile unsigned int proc_count;
 /* it would be better to use a lock here, but we use a semaphore because locks are not implemented in the base kernel */ 
 static struct semaphore *proc_count_mutex;
 /* used to signal the kernel menu thread when there are no processes */
-struct semaphore *no_proc_sem;   
+struct semaphore *no_proc_sem;
 #endif  // UW
 
-
+#if OPT_A1
+static volatile unsigned int pid_count;
+static struct semaphore *pid_count_mutex;
+#endif // OPT_A1
 
 /*
  * Create a proc structure.
@@ -89,6 +94,10 @@ proc_create(const char *name)
 		kfree(proc);
 		return NULL;
 	}
+
+#if OPT_A1
+        proc->p_pid = NULL;
+#endif
 
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
@@ -207,7 +216,16 @@ proc_bootstrap(void)
   if (no_proc_sem == NULL) {
     panic("could not create no_proc_sem semaphore\n");
   }
-#endif // UW 
+#endif // UW
+
+#ifdef OPT_A1
+  pid_count = PID_MIN;
+  pid_count_mutex = sem_create("pid_count_mutex",1);
+  if (pid_count_mutex == NULL) {
+    panic("could not create pid_count_mutex semaphore\n");
+  }
+#endif // UW
+
 }
 
 /*
@@ -270,6 +288,14 @@ proc_create_runprogram(const char *name)
 	proc_count++;
 	V(proc_count_mutex);
 #endif // UW
+
+#ifdef OPT_A1
+
+	P(pid_count_mutex);
+        proc->p_pid = pip_count;
+        pip_count++;
+	V(pid_count_mutex);
+#endif
 
 	return proc;
 }

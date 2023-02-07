@@ -9,6 +9,8 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
+#include <mips/trapframe.h>
+#include <clock.h>
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -48,6 +50,21 @@ void sys__exit(int exitcode) {
   panic("return from thread_exit in sys_exit\n");
 }
 
+int
+sys_fork(pid_t *retval, struct trapframe *tf)
+{
+   struct proc *child = proc_create_runprogram("child");
+   struct trapframe_for_child = kmalloc(sizeof(struct trapframe));
+
+   trapframe_for_child = &tf;
+   as_copy(curproc_getas(), child->p_addrspace);
+
+   thread_fork("child_thread", child, enter_forked_process(trapframe_for_child, 0));
+   kfree(trapframe_for_child);
+
+   clocksleep(1);
+   return 0;
+}
 
 /* stub handler for getpid() system call                */
 int
@@ -55,8 +72,7 @@ sys_getpid(pid_t *retval)
 {
   /* for now, this is just a stub that always returns a PID of 1 */
   /* you need to fix this to make it work properly */
-  *retval = 1;
-  return(0);
+  return(curproc->p_pid);
 }
 
 /* stub handler for waitpid() system call                */
