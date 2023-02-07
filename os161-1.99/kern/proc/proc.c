@@ -96,7 +96,7 @@ proc_create(const char *name)
 	}
 
 #if OPT_A1
-        proc->p_pid = NULL;
+    proc->p_pid = 0;
 #endif
 
 	threadarray_init(&proc->p_threads);
@@ -290,10 +290,11 @@ proc_create_runprogram(const char *name)
 #endif // UW
 
 #ifdef OPT_A1
-
 	P(pid_count_mutex);
-        proc->p_pid = pip_count;
-        pip_count++;
+	DEBUG(DB_THREADS,"Created a new proc with the p_pid: %d", pid_count);
+    proc->p_pid = pid_count;
+    pid_count++;
+    DEBUG(DB_THREADS,"pip_count is now: %d", pid_count);
 	V(pid_count_mutex);
 #endif
 
