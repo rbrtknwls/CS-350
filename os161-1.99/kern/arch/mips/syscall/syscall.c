@@ -181,7 +181,6 @@ syscall(struct trapframe *tf)
  * Thus, you can trash it and do things another way if you prefer.
  */
 #ifdef OPT_A1
-static
 void
 enter_forked_process(struct trapframe *tf, unsigned long data2)
 {
@@ -190,7 +189,6 @@ enter_forked_process(struct trapframe *tf, unsigned long data2)
 	mips_usermode(tf);
 }
 #else
-static
 void
 enter_forked_process(struct trapframe *tf)
 {
