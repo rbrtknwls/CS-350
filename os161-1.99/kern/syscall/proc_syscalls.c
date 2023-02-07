@@ -60,16 +60,16 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    struct proc *child = proc_create_runprogram("child");
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
-   trapframe_for_child = &tf;
-   
-   as_copy(curproc_getas(), child->p_addrspace);
+   trapframe_for_child = tf;
+
+   as_copy(curproc_getas(), &child->p_addrspace);
 
    thread_fork("child_thread",
                child,
                enter_forked_process(trapframe_for_child, 0)
                );
 
-   retval = child->p_pid;
+   retval = *child->p_pid;
 
    kfree(trapframe_for_child);
 
