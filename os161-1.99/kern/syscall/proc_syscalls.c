@@ -12,6 +12,8 @@
 #include <mips/trapframe.h>
 #include <clock.h>
 
+#include "opt-A1.h"
+
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
@@ -50,11 +52,12 @@ void sys__exit(int exitcode) {
   panic("return from thread_exit in sys_exit\n");
 }
 
+#ifdef OPT_A1
 int
 sys_fork(pid_t *retval, struct trapframe *tf)
 {
    struct proc *child = proc_create_runprogram("child");
-   struct trapframe_for_child = kmalloc(sizeof(struct trapframe));
+   struct trapframe trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    trapframe_for_child = &tf;
    as_copy(curproc_getas(), child->p_addrspace);
@@ -65,14 +68,19 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    clocksleep(1);
    return 0;
 }
+#endif
 
 /* stub handler for getpid() system call                */
 int
 sys_getpid(pid_t *retval)
 {
-  /* for now, this is just a stub that always returns a PID of 1 */
-  /* you need to fix this to make it work properly */
-  return(curproc->p_pid);
+  #ifdef OPT_A1
+     DEBUG(DB_THREADS,"Getting pid for proc: %s", curproc->p_name);
+     *retval = curproc->p_pid;
+  #else
+     *retval = 1;
+  #endif
+  return(0);
 }
 
 /* stub handler for waitpid() system call                */

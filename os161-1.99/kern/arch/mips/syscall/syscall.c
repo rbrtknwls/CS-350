@@ -130,16 +130,12 @@ syscall(struct trapframe *tf)
 			    (pid_t *)&retval);
 	  break;
 #endif // UW
-        case SYS_fork:
-          err = sys_fork((pid_t *) &retval,
-                         tf);
 
 #ifdef OPT_A1
-
+    case SYS_fork:
+      err = sys_fork((pid_t *) &retval,
+                 tf);
 #endif
-
-
-	    /* Add stuff here */
  
 	default:
 	  kprintf("Unknown syscall %d\n", callno);
@@ -184,10 +180,18 @@ syscall(struct trapframe *tf)
  *
  * Thus, you can trash it and do things another way if you prefer.
  */
+#ifdef OPT_A1
 void
 enter_forked_process(struct trapframe *tf, unsigned long data2)
 {
-        tf->epc += 4;
-        tf->v0 = 0;
+    tf->epc += 4;
+    tf->v0 = 0;
 	mips_usermode(tf);
 }
+#else
+void
+enter_forked_process(struct trapframe *tf)
+{
+	(void)tf;
+}
+#endif
