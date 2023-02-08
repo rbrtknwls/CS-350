@@ -291,10 +291,10 @@ proc_create_runprogram(const char *name)
 
 #ifdef OPT_A1
 	P(pid_count_mutex);
-	DEBUG(DB_THREADS,"Created a new proc with the p_pid: %d", pid_count);
+	DEBUG(DB_THREADS,"Created a new proc with the p_pid: %d\n", pid_count);
     proc->p_pid = pid_count;
     pid_count++;
-    DEBUG(DB_THREADS,"pip_count is now: %d", pid_count);
+    DEBUG(DB_THREADS,"pip_count is now: %d\n", pid_count);
 	V(pid_count_mutex);
 #endif
 

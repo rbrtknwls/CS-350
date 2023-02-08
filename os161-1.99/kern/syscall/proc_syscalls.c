@@ -56,7 +56,7 @@ void sys__exit(int exitcode) {
 int
 sys_fork(pid_t *retval, struct trapframe *tf)
 {
-   DEBUG(DB_THREADS,"FORKING A NEW PROCESS");
+   DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
    struct proc *child = proc_create_runprogram("child");
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
@@ -75,6 +75,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    kfree(trapframe_for_child);
 
    clocksleep(1);
+   DEBUG(DB_THREADS,"===FORKING IS DONE===\n");
    return 0;
 }
 #endif
@@ -84,7 +85,7 @@ int
 sys_getpid(pid_t *retval)
 {
   #ifdef OPT_A1
-     DEBUG(DB_THREADS,"Getting pid for proc: %s", curproc->p_name);
+     DEBUG(DB_THREADS,"Getting pid for proc: %s \n", curproc->p_name);
      *retval = curproc->p_pid;
   #else
      *retval = 1;
