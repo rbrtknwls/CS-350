@@ -182,15 +182,17 @@ syscall(struct trapframe *tf)
  */
 #ifdef OPT_A1
 void
-enter_forked_process(struct trapframe *tf, unsigned long data2)
+enter_forked_process(void* data1, unsigned long data2)
 {
-    tf->epc += 4;
-    tf->v0 = 0;
-	mips_usermode(tf);
+    struct trapframe *tf = (trapframe) data;
+    /*tf->epc += 4;
+    tf->v0 = 0;*
+	mips_usermode(tf);*/
+
 }
 #else
 void
-enter_forked_process(struct trapframe *tf, unsigned long data2)
+enter_forked_process(struct trapframe *tf)
 {
 	(void)tf;
 }
