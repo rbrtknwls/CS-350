@@ -39,6 +39,8 @@ void sys__exit(int exitcode) {
   as_destroy(as);
 
 #ifdef OPT_A1 // Loop through children and delete them
+  DEBUG(DB_THREADS,"===DELETE PROCESS===\n");
+  DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
     array_remove(p->p_children, 0);
@@ -69,6 +71,7 @@ void sys__exit(int exitcode) {
     p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
   }
+  DEBUG(DB_THREADS,"===DELETE IS DONE===\n");
 #else
   proc_destroy(p);
 #endif
@@ -116,7 +119,6 @@ int
 sys_getpid(pid_t *retval)
 {
   #ifdef OPT_A1
-     DEBUG(DB_THREADS,"===Getting pid for proc: %s ===\n", curproc->p_name);
      *retval = curproc->p_pid;
   #else
      *retval = 1;
@@ -135,6 +137,41 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
+  #ifdef OPT_A1
+    DEBUG(DB_THREADS,"===WAITING FOR PROCESS: %d===\n", pid);
+
+    int idx = 0; // Stores the current index of the child we are looking for
+
+    struct proc *temp_child = NULL;
+    while (idx < curproc->p_children->num) {
+        temp_child = array_get(curproc->p_children, idx);
+        if (temp_child->p_pid == pid) {
+            break;
+        }
+    }
+    if (temp_child == NULL) {
+        DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
+        exitstatus = _MKWAIT_EXIT(ECHILD);
+    } else {
+        DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
+        spinlock_acquire(&temp_child->p_lock);
+        while (!temp_child->p_exitstatus == P_running) {
+            spinlock_release(&temp_child->p_lock);
+            clocksleep(1);
+            spinlock_acquire(&temp_child->p_lock);
+        }
+        spinlock_release(&temp_child->p_lock);
+        DEBUG(DB_THREADS,"child has exited with an exist status of: %d\n", temp_child->p_exitcode);
+
+        exitstatus = _MKWAIT_EXIT(temp_child->p_exitcode);
+        proc_destroy(temp_child);
+
+        DEBUG(DB_THREADS,"===DONE WAITING===\n");
+    }
+
+
+  #else
+
   /* this is just a stub implementation that always reports an
      exit status of 0, regardless of the actual exit status of
      the specified process.   
@@ -149,6 +186,7 @@ sys_waitpid(pid_t pid,
   }
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = 0;
+  #endif
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
