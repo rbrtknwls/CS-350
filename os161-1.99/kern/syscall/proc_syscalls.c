@@ -64,7 +64,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    *trapframe_for_child = *tf;
    DEBUG(DB_THREADS,"Child trap has a epc of: %d | v0: %d\n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0);
 
-   as_copy(curproc_getas(), &child->p_addrspace);
+   as_copy(curproc_getas(), child->p_addrspace);
 
    DEBUG(DB_THREADS,"Trapframe is now updated\n");
 

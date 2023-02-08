@@ -50,6 +50,7 @@
 #include <addrspace.h>
 #include <mainbus.h>
 #include <vnode.h>
+#include <mips/trapframe.h>
 
 #include "opt-synchprobs.h"
 
@@ -524,6 +525,9 @@ thread_fork(const char *name,
 	 * for the spllower() that will be done releasing it.
 	 */
 	newthread->t_iplhigh_count++;
+
+	struct trapframe *tf = data1;
+	DEBUG(DB_THREADS,"Trap has a epc of: %d | v0: %d\n", tf->tf_epc, tf->tf_v0);
 
 	/* Set up the switchframe so entrypoint() gets called */
 	switchframe_init(newthread, entrypoint, data1, data2);
