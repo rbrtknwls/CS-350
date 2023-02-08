@@ -524,7 +524,7 @@ thread_fork(const char *name,
 	 * for the spllower() that will be done releasing it.
 	 */
 	newthread->t_iplhigh_count++;
-    DEBUG(DB_THREADS,"SOME SHIT\n");
+
 	/* Set up the switchframe so entrypoint() gets called */
 	switchframe_init(newthread, entrypoint, data1, data2);
 
