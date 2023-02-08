@@ -77,8 +77,6 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    *retval = child->p_pid;
 
-   kfree(trapframe_for_child);
-
    clocksleep(1);
    DEBUG(DB_THREADS,"===FORKING IS DONE===\n");
    return 0;
