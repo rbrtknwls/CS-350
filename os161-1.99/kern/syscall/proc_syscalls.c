@@ -159,8 +159,8 @@ sys_waitpid(pid_t pid,
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
         exitstatus = _MKWAIT_EXIT(ECHILD);
     } else {
-        DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
         spinlock_acquire(&temp_child->p_lock);
+        DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
         while (!temp_child->p_exitstatus == P_running) {
             spinlock_release(&temp_child->p_lock);
             clocksleep(1);
