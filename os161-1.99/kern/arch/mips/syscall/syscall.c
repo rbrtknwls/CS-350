@@ -190,7 +190,7 @@ enter_forked_process(struct trapframe *tf, unsigned long data2)
 }
 #else
 void
-enter_forked_process(struct trapframe *tf)
+enter_forked_process(struct trapframe *tf, unsigned long data2)
 {
 	(void)tf;
 }
