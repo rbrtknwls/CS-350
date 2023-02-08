@@ -144,7 +144,7 @@ sys_waitpid(pid_t pid,
   #ifdef OPT_A1
     DEBUG(DB_THREADS,"===WAITING FOR PROCESS: %d===\n", pid);
 
-    int idx = 0; // Stores the current index of the child we are looking for
+    unsigned int idx = 0; // Stores the current index of the child we are looking for
     bool foundChild = false;
     struct proc *temp_child;
 
