@@ -186,12 +186,13 @@ enter_forked_process(void* data1, unsigned long data2)
 {
     DEBUG(DB_THREADS,"Entering the forked process\n");
     (void)data2;
-    struct trapframe tf = *(struct trapframe *) data1;
-    DEBUG(DB_THREADS,"Trap has a epc of: %d | v0: %d\n", tf.tf_epc, tf.tf_v0);
+    struct trapframe *tf = data1;
+    struct trapframe tf_copy = *tf;
+    DEBUG(DB_THREADS,"Trap has a epc of: %d | v0: %d\n", tf_copy.tf_epc, tf_copy.tf_v0);
 
-    tf.tf_epc += 4;
-    tf.tf_v0 = 0;
-	mips_usermode(&tf);
+    tf_copy.tf_epc += 4;
+    tf_copy.tf_v0 = 0;
+	mips_usermode(&tf_copy);
 
 }
 #else
