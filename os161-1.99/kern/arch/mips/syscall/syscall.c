@@ -189,9 +189,9 @@ enter_forked_process(void* data1, unsigned long data2)
     struct trapframe *tf = (struct trapframe *) data1;
     struct trapframe tf_copy = *tf;
 
-    tf_copy->tf_epc += 4;
-    tf_copy->tf_v0 = 0;
-	mips_usermode(tf_copy);
+    tf_copy.tf_epc += 4;
+    tf_copy.tf_v0 = 0;
+	mips_usermode(&tf_copy);
 
 }
 #else
