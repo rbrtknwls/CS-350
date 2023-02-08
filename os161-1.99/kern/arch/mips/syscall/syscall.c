@@ -186,7 +186,7 @@ enter_forked_process(void* data1, unsigned long data2)
 {
 
     (void)data2;
-    struct trapframe *tf = (struct trapframe) data1;
+    struct trapframe *tf = (struct trapframe *) data1;
 
     tf->epc += 4;
     tf->v0 = 0;*
