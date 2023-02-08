@@ -45,11 +45,14 @@ void sys__exit(int exitcode) {
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
 #ifdef OPT_A1
+  spinlock_acquire(&p->p_lock)
   if (curproc->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+    spinlock_release(&p->p_lock)
     proc_destroy(p);
   } else {
     curproc->p_exitstatus = P_exited;
     curproc->p_exitcode = exitcode;
+    spinlock_release(&p->p_lock)
   }
 #else
   proc_destroy(p);
