@@ -146,7 +146,7 @@ sys_waitpid(pid_t pid,
 
     int idx = 0; // Stores the current index of the child we are looking for
 
-    struct proc *temp_child = null;
+    struct proc *temp_child;
 
     while (idx < curproc->p_children->num) {
         temp_child = array_get(curproc->p_children, idx);
@@ -154,7 +154,7 @@ sys_waitpid(pid_t pid,
             break;
         }
     }
-    if (temp_child == null) {
+    if (temp_child == NULL) {
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
         exitstatus = _MKWAIT_EXIT(ECHILD);
     } else {
