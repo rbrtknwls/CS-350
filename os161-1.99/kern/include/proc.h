@@ -38,6 +38,7 @@
 
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
+#include <array.h>
 #include "opt-A1.h"
 
 struct addrspace;
@@ -61,7 +62,14 @@ struct proc {
 	struct vnode *p_cwd;		/* current working directory */
 
 #ifdef OPT_A1
-        int p_pid;
+    int p_pid;
+    int p_exitcode;
+    int p_existstatus;
+
+    struct array *p_children;
+    struct proc *p_parent;
+
+
 #endif
 
 #ifdef UW
