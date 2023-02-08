@@ -64,6 +64,8 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
+   DEBUG(DB_THREADS,"Trapframe is now updated\n");
+
    thread_fork("child_thread",
                child,
                &enter_forked_process,
