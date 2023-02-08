@@ -42,13 +42,13 @@ void sys__exit(int exitcode) {
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
     array_remove(p->p_children, 0);
-    spinlock_acquire(&temp_child->p_lock)
+    spinlock_acquire(&temp_child->p_lock);
     if (temp_child->p_exitstatus == P_exited) {
-        spinlock_release(&temp_child->p_lock)
+        spinlock_release(&temp_child->p_lock);
         proc_destroy(temp_child);
     } else {
         temp_child->p_parent = NULL;
-        spinlock_release(&temp_child->p_lock) 
+        spinlock_release(&temp_child->p_lock);
     }
   }
 
