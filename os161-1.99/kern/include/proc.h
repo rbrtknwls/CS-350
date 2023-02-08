@@ -64,7 +64,7 @@ struct proc {
 #ifdef OPT_A1
     int p_pid;
     int p_exitcode;
-    int p_existstatus;
+    int p_exitstatus;
 
     struct array *p_children;
     struct proc *p_parent;
