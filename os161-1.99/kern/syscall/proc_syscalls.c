@@ -38,6 +38,21 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
 
+#ifdef OPT_A1 // Loop through children and delete them
+  while (p->p_children->num != 0) {
+    struct proc *temp_child = array_get(p->p_children, 0);
+    array_remove(p->p_children, 0);
+    spinlock_acquire(&temp_child->p_lock)
+    if (temp_child->p_exitstatus == P_exited) {
+        spinlock_release(&temp_child->p_lock)
+        proc_destroy(temp_child);
+    } else {
+        temp_child->p_parent = NULL;
+        spinlock_release(&temp_child->p_lock) 
+    }
+  }
+
+#endif
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
@@ -46,12 +61,12 @@ void sys__exit(int exitcode) {
      will wake up the kernel menu thread */
 #ifdef OPT_A1
   spinlock_acquire(&p->p_lock);
-  if (curproc->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+  if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     spinlock_release(&p->p_lock);
     proc_destroy(p);
   } else {
-    curproc->p_exitstatus = P_exited;
-    curproc->p_exitcode = exitcode;
+    p->p_exitstatus = P_exited;
+    p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
   }
 #else
