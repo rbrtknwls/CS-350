@@ -177,6 +177,10 @@ proc_destroy(struct proc *proc)
 	}
 #endif // UW
 
+#ifdef OPT_A1
+    array_destroy(proc->p_children);
+#endif
+
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
 

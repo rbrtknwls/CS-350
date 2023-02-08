@@ -23,7 +23,6 @@ void sys__exit(int exitcode) {
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
      an unused variable */
-  (void)exitcode;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -45,7 +44,16 @@ void sys__exit(int exitcode) {
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
+#ifdef OPT_A1
+  if (curproc->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+    proc_destroy(p);
+  } else {
+    curporc->p_exitstatus = P_exited;
+    curproc->p_exitcode = exitcode;
+  }
+#else
   proc_destroy(p);
+#endif
   
   thread_exit();
   /* thread_exit() does not return, so we should never get here */
