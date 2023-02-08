@@ -67,8 +67,6 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
-   DEBUG(DB_THREADS,"Trapframe is now updated\n");
-
    thread_fork("child_thread",
                child,
                &enter_forked_process,
@@ -88,7 +86,7 @@ int
 sys_getpid(pid_t *retval)
 {
   #ifdef OPT_A1
-     DEBUG(DB_THREADS,"Getting pid for proc: %s \n", curproc->p_name);
+     DEBUG(DB_THREADS,"===Getting pid for proc: %s ===\n", curproc->p_name);
      *retval = curproc->p_pid;
   #else
      *retval = 1;
