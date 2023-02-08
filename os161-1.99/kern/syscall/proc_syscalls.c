@@ -151,6 +151,7 @@ sys_waitpid(pid_t pid,
     while (idx < curproc->p_children->num) {
         temp_child = array_get(curproc->p_children, idx);
         if (temp_child->p_pid == pid) {
+            array_remove(curproc->p_children, idx);
             foundChild = true;
             break;
         }
