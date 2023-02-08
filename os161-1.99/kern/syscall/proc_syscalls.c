@@ -48,7 +48,7 @@ void sys__exit(int exitcode) {
   if (curproc->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     proc_destroy(p);
   } else {
-    curporc->p_exitstatus = P_exited;
+    curproc->p_exitstatus = P_exited;
     curproc->p_exitcode = exitcode;
   }
 #else
