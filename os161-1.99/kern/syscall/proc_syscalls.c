@@ -72,6 +72,8 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    child->p_parent = curproc;
 
+   array_add(curproc->p_children, child, NULL);
+
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    *trapframe_for_child = *tf;
