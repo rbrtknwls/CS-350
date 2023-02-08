@@ -116,6 +116,6 @@ struct addrspace *curproc_setas(struct addrspace *);
 #ifdef OPT_A1
 #define P_running  0
 #define P_exited   1
-#ifdef OPT_A1
+#endif
 
 #endif /* _PROC_H_ */
