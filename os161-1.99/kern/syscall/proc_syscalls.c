@@ -62,7 +62,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    *trapframe_for_child = *tf;
-   DEBUG(DB_THREADS,"Child trap has a epc of: %d | v0: %d\n", tf->tf_epc, tf->tf_v0);
+   DEBUG(DB_THREADS,"Child trap has a epc of: %d | v0: %d\n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0);
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
