@@ -58,11 +58,12 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 {
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
    struct proc *child = proc_create_runprogram("child");
-   DEBUG(DB_THREADS,"Current Trap has a epc of: %d | v0: %d\n", tf->tf_epc, tf->tf_v0);
+
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    *trapframe_for_child = *tf;
-   DEBUG(DB_THREADS,"Child trap has a epc of: %d | v0: %d\n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0);
+   DEBUG(DB_THREADS,"Parent epc: %d | v0: %d | mem: %p \n", tf->tf_epc, tf->tf_v0, tf);
+   DEBUG(DB_THREADS,"Child  epc: %d | v0: %d | mem: %p \n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0, trapframe_for_child);
 
    as_copy(curproc_getas(), &child->p_addrspace);
 

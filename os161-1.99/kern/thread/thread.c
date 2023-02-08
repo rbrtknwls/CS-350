@@ -526,9 +526,6 @@ thread_fork(const char *name,
 	 */
 	newthread->t_iplhigh_count++;
 
-	struct trapframe *tf = data1;
-	DEBUG(DB_THREADS,"Trap has a epc of: %d | v0: %d\n", tf->tf_epc, tf->tf_v0);
-
 	/* Set up the switchframe so entrypoint() gets called */
 	switchframe_init(newthread, entrypoint, data1, data2);
 
