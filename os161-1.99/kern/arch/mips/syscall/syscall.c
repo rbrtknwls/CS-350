@@ -184,7 +184,7 @@ syscall(struct trapframe *tf)
 void
 enter_forked_process(void* data1, unsigned long data2)
 {
-
+    DEBUG(DB_THREADS,"Entering the forked process\n");
     (void)data2;
     struct trapframe *tf = (struct trapframe *) data1;
 
