@@ -92,18 +92,18 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    array_add(curproc->p_children, child, NULL);
 
-   struct trapframe trapframe_for_child = *kmalloc(sizeof(struct trapframe));
+   struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
-   trapframe_for_child = *tf;
-   DEBUG(DB_THREADS,"Parent TF epc: %d | v0: %d | mem: %p \n", tf.tf_epc, tf.tf_v0, tf);
-   DEBUG(DB_THREADS,"Child TF  epc: %d | v0: %d | mem: %p \n", trapframe_for_child.tf_epc, trapframe_for_child.tf_v0, &trapframe_for_child);
+   *trapframe_for_child = *tf;
+   DEBUG(DB_THREADS,"Parent TF epc: %d | v0: %d | mem: %p \n", tf->tf_epc, tf->tf_v0, tf);
+   DEBUG(DB_THREADS,"Child TF  epc: %d | v0: %d | mem: %p \n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0, trapframe_for_child);
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
    thread_fork("child_thread",
                child,
                &enter_forked_process,
-               &trapframe_for_child,
+               trapframe_for_child,
                0);
 
    *retval = child->p_pid;
