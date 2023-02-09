@@ -66,8 +66,8 @@ struct proc {
     int p_exitcode;
     int p_exitstatus;
 
-    struct array *p_children;
-    struct proc *p_parent;
+//    struct array *p_children;
+//    struct proc *p_parent;
 
 
 #endif
