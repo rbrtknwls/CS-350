@@ -98,10 +98,10 @@ proc_create(const char *name)
 
 #if OPT_A1
     proc->p_pid = 0;
-    proc->p_parent = 0;
+    //proc->p_parent = 0;
     proc->p_exitcode = 0;
     proc->p_exitstatus = P_running;
-    proc->p_children = array_create();
+    //proc->p_children = array_create();
 #endif
 
 	threadarray_init(&proc->p_threads);
@@ -178,7 +178,7 @@ proc_destroy(struct proc *proc)
 #endif // UW
 
 #ifdef OPT_A1
-    array_destroy(proc->p_children);
+    //array_destroy(proc->p_children);
 #endif
 
 	threadarray_cleanup(&proc->p_threads);
