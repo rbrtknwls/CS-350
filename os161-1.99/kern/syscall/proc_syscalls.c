@@ -26,7 +26,7 @@ void sys__exit(int exitcode) {
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
-  KASSERT(curproc->p_addrspace != NULL);
+  KASSERT(p->p_addrspace != NULL);
   as_deactivate();
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -88,9 +88,9 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
    struct proc *child = proc_create_runprogram("child");
 
-   child->p_parent = curproc;
+   /*child->p_parent = curproc;
 
-   array_add(curproc->p_children, child, NULL);
+   array_add(curproc->p_children, child, NULL);*/
 
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
@@ -144,7 +144,7 @@ sys_waitpid(pid_t pid,
 
   #ifdef OPT_A1
     DEBUG(DB_THREADS,"===WAITING FOR PROCESS: %d===\n", pid);
-
+    /*
     unsigned int idx = 0; // Stores the current index of the child we are looking for
     bool foundChild = false;
     struct proc *temp_child;
@@ -174,9 +174,9 @@ sys_waitpid(pid_t pid,
         proc_destroy(temp_child);
 
         DEBUG(DB_THREADS,"===DONE WAITING===\n");
-    }
+    }*/
 
-
+  exitstatus = 0;
   #else
 
   /* this is just a stub implementation that always reports an
