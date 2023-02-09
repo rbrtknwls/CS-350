@@ -52,7 +52,7 @@
 #include <synch.h>
 #include <kern/fcntl.h>
 #include <limits.h>
-#include <array.h>
+//#include <array.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
