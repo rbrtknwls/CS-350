@@ -39,7 +39,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
 
 #ifdef OPT_A1 // Loop through children and delete them
-  DEBUG(DB_THREADS,"===DELETE PROCESS===\n");
+  DEBUG(DB_THREADS,"===DELETE PROCESS===\n"); /*
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
@@ -52,7 +52,7 @@ void sys__exit(int exitcode) {
         temp_child->p_parent = NULL;
         spinlock_release(&temp_child->p_lock);
     }
-  }
+  }*/
 
 #endif
   /* detach this thread from its process */
@@ -61,7 +61,7 @@ void sys__exit(int exitcode) {
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
-#ifdef OPT_A1
+#ifdef OPT_A1/*
   spinlock_acquire(&p->p_lock);
   if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     spinlock_release(&p->p_lock);
@@ -71,7 +71,7 @@ void sys__exit(int exitcode) {
     p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
   }
-  DEBUG(DB_THREADS,"===DELETE IS DONE===\n");
+  DEBUG(DB_THREADS,"===DELETE IS DONE===\n");*/
 #else
   proc_destroy(p);
 #endif
