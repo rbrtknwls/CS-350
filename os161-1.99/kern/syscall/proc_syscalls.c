@@ -86,6 +86,9 @@ int
 sys_fork(pid_t *retval, struct trapframe *tf)
 {
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
+   if (curproc->console) {
+      DEBUG(DB_THREADS,"===CONSOLE YAYAYAYAYY==\n");
+   }
    struct proc *child = proc_create_runprogram("child");
 
    child->p_parent = curproc;
@@ -190,6 +193,7 @@ sys_waitpid(pid_t pid,
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = 0;
   #endif
+
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
