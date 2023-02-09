@@ -86,23 +86,12 @@ int
 sys_fork(pid_t *retval, struct trapframe *tf)
 {
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
-   if (curproc->console) {
-      DEBUG(DB_THREADS,"===CONSOLE YAYAYAYAYY==\n");
-   }
    struct proc *child = proc_create_runprogram("child");
-      if (curproc->console) {
-         DEBUG(DB_THREADS,"===CONSOLE YAYAYAYAYY (1) ==\n");
-      }
+   child->console = curproc->console;
 
    child->p_parent = curproc;
-         if (curproc->console) {
-            DEBUG(DB_THREADS,"===CONSOLE YAYAYAYAYY (2) ==\n");
-         }
 
    array_add(curproc->p_children, child, NULL);
-         if (curproc->console) {
-            DEBUG(DB_THREADS,"===CONSOLE YAYAYAYAYY (3) ==\n");
-         }
 
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
          if (curproc->console) {
