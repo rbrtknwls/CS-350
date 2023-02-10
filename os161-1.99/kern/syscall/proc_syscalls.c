@@ -88,9 +88,9 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
    struct proc *child = proc_create_runprogram("child");
 
-   child->p_parent = curproc;
+   /*child->p_parent = curproc;
 
-   array_add(curproc->p_children, child, NULL);
+   array_add(curproc->p_children, child, NULL);*/
 
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
