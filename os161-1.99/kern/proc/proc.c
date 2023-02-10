@@ -270,6 +270,11 @@ proc_create_runprogram(const char *name)
 
 	proc->p_addrspace = NULL;
 
+#ifdef OPT_A1
+    proc->p_parent = NULL;
+    proc->p_children = array_create();
+#endif
+
 	/* VFS fields */
 
 #ifdef UW
