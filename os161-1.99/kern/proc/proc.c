@@ -100,7 +100,7 @@ proc_create(const char *name)
     proc->p_pid = 0;
     proc->p_parent = NULL;
     proc->p_exitcode = 0;
-    proc->p_exitstatus = P_running;
+//    proc->p_exitstatus = P_running;
 //    proc->p_children = array_create();
 #endif
 
