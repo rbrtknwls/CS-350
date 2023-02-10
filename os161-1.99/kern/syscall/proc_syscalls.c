@@ -62,7 +62,7 @@ void sys__exit(int exitcode) {
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
 #ifdef OPT_A1
-  spinlock_acquire(&p->p_lock);
+  spinlock_acquire(&p->p_lock);/*
   if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     spinlock_release(&p->p_lock);
     proc_destroy(p);
@@ -70,7 +70,7 @@ void sys__exit(int exitcode) {
     p->p_exitstatus = P_exited;
     p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
-  }
+*/
   DEBUG(DB_THREADS,"===DELETE IS DONE===\n");
 #else
   proc_destroy(p);
@@ -89,7 +89,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    struct proc *child = proc_create_runprogram("child");
    DEBUG(DB_THREADS,"Allocating to parent\n");
 
-   child->p_parent = curproc;
+   //child->p_parent = curproc;
 
    DEBUG(DB_THREADS,"Allocating to children\n");
 
