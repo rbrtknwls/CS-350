@@ -39,7 +39,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
 
 #ifdef OPT_A1 // Loop through children and delete them
-  DEBUG(DB_THREADS,"===DELETE PROCESS===\n");
+  DEBUG(DB_THREADS,"===DELETE PROCESS===\n");/*
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
@@ -52,7 +52,7 @@ void sys__exit(int exitcode) {
         temp_child->p_parent = NULL;
         spinlock_release(&temp_child->p_lock);
     }
-  }
+  }*/
 
 #endif
   /* detach this thread from its process */
@@ -152,7 +152,7 @@ sys_waitpid(pid_t pid,
     unsigned int idx = 0; // Stores the current index of the child we are looking for
     bool foundChild = false;
     struct proc *temp_child;
-
+    /*
     while (idx < curproc->p_children->num) {
         temp_child = array_get(curproc->p_children, idx);
         if (temp_child->p_pid == pid) {
@@ -160,7 +160,7 @@ sys_waitpid(pid_t pid,
             foundChild = true;
             break;
         }
-    }
+    }*/
     if (!foundChild) {
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
         exitstatus = _MKWAIT_EXIT(ECHILD);
