@@ -38,6 +38,7 @@
 
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
+//#include <array.h>
 #include "opt-A1.h"
 
 struct addrspace;
@@ -62,6 +63,11 @@ struct proc {
 
 #ifdef OPT_A1
     int p_pid;
+    int p_exitcode;
+    int p_exitstatus;
+
+    struct array *p_children;
+    struct proc *p_parent;
 
 #endif
 
@@ -106,5 +112,8 @@ struct addrspace *curproc_getas(void);
 /* Change the address space of the current process, and return the old one. */
 struct addrspace *curproc_setas(struct addrspace *);
 
-
+#ifdef OPT_A1
+#define P_exited         2
+#define P_running        1
+#endif
 #endif /* _PROC_H_ */

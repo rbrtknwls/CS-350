@@ -23,11 +23,10 @@ void sys__exit(int exitcode) {
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
      an unused variable */
-  (void)exitcode;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
-  KASSERT(curproc->p_addrspace != NULL);
+  KASSERT(p->p_addrspace != NULL);
   as_deactivate();
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -39,13 +38,43 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
 
+#ifdef OPT_A1 // Loop through children and delete them
+  DEBUG(DB_THREADS,"===DELETE PROCESS===\n");
+  DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
+  while (p->p_children->num != 0) {
+    struct proc *temp_child = array_get(p->p_children, 0);
+    array_remove(p->p_children, 0);
+    spinlock_acquire(&temp_child->p_lock);
+    if (temp_child->p_exitstatus == P_exited) {
+        spinlock_release(&temp_child->p_lock);
+        proc_destroy(temp_child);
+    } else {
+        temp_child->p_parent = NULL;
+        spinlock_release(&temp_child->p_lock);
+    }
+  }
+
+#endif
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
+#ifdef OPT_A1
+  spinlock_acquire(&p->p_lock);
+  if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+    spinlock_release(&p->p_lock);
+    proc_destroy(p);
+  } else {
+    p->p_exitstatus = P_exited;
+    p->p_exitcode = exitcode;
+    spinlock_release(&p->p_lock);
+  }
+  DEBUG(DB_THREADS,"===DELETE IS DONE===\n");
+#else
   proc_destroy(p);
+#endif
   
   thread_exit();
   /* thread_exit() does not return, so we should never get here */
@@ -59,11 +88,16 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    DEBUG(DB_THREADS,"===FORKING A NEW PROCESS==\n");
    struct proc *child = proc_create_runprogram("child");
 
+   child->p_parent = curproc;
+
+   array_add(curproc->p_children, child, NULL);
+
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    *trapframe_for_child = *tf;
-   DEBUG(DB_THREADS,"Parent epc: %d | v0: %d | mem: %p \n", tf->tf_epc, tf->tf_v0, tf);
-   DEBUG(DB_THREADS,"Child  epc: %d | v0: %d | mem: %p \n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0, trapframe_for_child);
+   DEBUG(DB_THREADS,"Parent TF epc: %d | v0: %d | mem: %p \n", tf->tf_epc, tf->tf_v0, tf);
+   DEBUG(DB_THREADS,"Child TF  epc: %d | v0: %d | mem: %p \n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0, trapframe_for_child);
+
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
@@ -86,7 +120,6 @@ int
 sys_getpid(pid_t *retval)
 {
   #ifdef OPT_A1
-     DEBUG(DB_THREADS,"===Getting pid for proc: %s ===\n", curproc->p_name);
      *retval = curproc->p_pid;
   #else
      *retval = 1;
@@ -105,6 +138,44 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
+  if (options != 0) {
+      return(EINVAL);
+    }
+
+  #ifdef OPT_A1
+    DEBUG(DB_THREADS,"===WAITING FOR PROCESS: %d===\n", pid);
+    unsigned int idx = 0; // Stores the current index of the child we are looking for
+    bool foundChild = false;
+    struct proc *temp_child;
+
+    while (idx < curproc->p_children->num) {
+        temp_child = array_get(curproc->p_children, idx);
+        if (temp_child->p_pid == pid) {
+            array_remove(curproc->p_children, idx);
+            foundChild = true;
+            break;
+        }
+    }
+    if (!foundChild) {
+        DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
+        exitstatus = _MKWAIT_EXIT(ECHILD);
+    } else {
+        spinlock_acquire(&temp_child->p_lock);
+        DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
+        while (!temp_child->p_exitstatus == P_running) {
+            spinlock_release(&temp_child->p_lock);
+            clocksleep(1);
+            spinlock_acquire(&temp_child->p_lock);
+        }
+        spinlock_release(&temp_child->p_lock);
+        DEBUG(DB_THREADS,"child has exited with an exist status of: %d\n", temp_child->p_exitcode);
+        exitstatus = _MKWAIT_EXIT(temp_child->p_exitcode);
+        proc_destroy(temp_child);
+
+        DEBUG(DB_THREADS,"===DONE WAITING===\n");
+    }
+  #else
+
   /* this is just a stub implementation that always reports an
      exit status of 0, regardless of the actual exit status of
      the specified process.   
@@ -114,11 +185,10 @@ sys_waitpid(pid_t pid,
      Fix this!
   */
 
-  if (options != 0) {
-    return(EINVAL);
-  }
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = 0;
+  #endif
+
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);

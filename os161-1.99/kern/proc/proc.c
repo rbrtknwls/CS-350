@@ -52,6 +52,7 @@
 #include <synch.h>
 #include <kern/fcntl.h>
 #include <limits.h>
+//#include <array.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -97,6 +98,10 @@ proc_create(const char *name)
 
 #if OPT_A1
     proc->p_pid = 0;
+    //proc->p_parent = 0;
+    //proc->p_exitcode = 0;
+    //proc->p_exitstatus = P_running;
+    //proc->p_children = array_create();
 #endif
 
 	threadarray_init(&proc->p_threads);
@@ -171,6 +176,10 @@ proc_destroy(struct proc *proc)
 	  vfs_close(proc->console);
 	}
 #endif // UW
+
+#ifdef OPT_A1
+    //array_destroy(proc->p_children);
+#endif
 
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
