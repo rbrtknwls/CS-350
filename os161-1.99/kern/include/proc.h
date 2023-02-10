@@ -69,7 +69,6 @@ struct proc {
     struct array *p_children;
     struct proc *p_parent;
 
-
 #endif
 
 #ifdef UW
