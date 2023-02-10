@@ -98,10 +98,10 @@ proc_create(const char *name)
 
 #if OPT_A1
     proc->p_pid = 0;
-    //proc->p_parent = 0;
-    //proc->p_exitcode = 0;
-    //proc->p_exitstatus = P_running;
-    //proc->p_children = array_create();
+    proc->p_parent = NULL;
+    proc->p_exitcode = 0;
+    proc->p_exitstatus = P_running;
+    proc->p_children = array_create();
 #endif
 
 	threadarray_init(&proc->p_threads);
@@ -269,11 +269,6 @@ proc_create_runprogram(const char *name)
 	/* VM fields */
 
 	proc->p_addrspace = NULL;
-
-#ifdef OPT_A1
-    proc->p_parent = NULL;
-    proc->p_children = array_create();
-#endif
 
 	/* VFS fields */
 

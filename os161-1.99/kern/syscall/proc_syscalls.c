@@ -93,7 +93,7 @@ sys_fork(pid_t *retval, struct trapframe *tf)
 
    DEBUG(DB_THREADS,"Allocating to children\n");
 
-   array_add(curproc->p_children, child, NULL);
+   //array_add(curproc->p_children, child, NULL);
 
    DEBUG(DB_THREADS,"ArrayIsDone\n");
 
