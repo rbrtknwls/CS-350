@@ -67,7 +67,7 @@ struct proc {
     int p_exitstatus;
 
     /*struct array *p_children;*/
-    struct proc *p_parent;
+    //struct proc *p_parent;
 #endif
 
 #ifdef UW
