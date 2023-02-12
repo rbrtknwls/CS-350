@@ -189,13 +189,10 @@ enter_forked_process(void* data1, unsigned long data2)
     struct trapframe *tf = data1;
     DEBUG(DB_THREADS,"Entering the forked process, loc of data: %p \n", tf);
     struct trapframe tf_copy = *tf;
-    DEBUG(DB_THREADS,"COPIED TRAP FRAME\n");
     kfree(data1);
-    DEBUG(DB_THREADS,"Freed data\n");
 
     tf_copy.tf_epc += 4;
     tf_copy.tf_v0 = 0;
-    DEBUG(DB_THREADS,"Movedin\n");
 	mips_usermode(&tf_copy);
 
 }
