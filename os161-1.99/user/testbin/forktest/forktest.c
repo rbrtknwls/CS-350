@@ -158,7 +158,7 @@ test(int nowait)
 	 * These must be called in reverse order to avoid waiting
 	 * improperly.
 	 */
-	dowait(nowait, pid3); */
+	dowait(nowait, pid3);
 	dowait(nowait, pid2);
 	dowait(nowait, pid1);
 	dowait(nowait, pid0);
