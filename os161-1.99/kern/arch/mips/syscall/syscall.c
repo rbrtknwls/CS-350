@@ -187,7 +187,6 @@ enter_forked_process(void* data1, unsigned long data2)
 {
     (void)data2;
     struct trapframe *tf = data1;
-    DEBUG(DB_THREADS,"Entering the forked process, loc of data: %p \n", tf);
     struct trapframe tf_copy = *tf;
     kfree(data1);
 

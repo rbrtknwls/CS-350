@@ -26,7 +26,7 @@ void sys__exit(int exitcode) {
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
-  DEBUG(DB_THREADS,"===(START) DELETE PROCESS===\n");
+  //DEBUG(DB_THREADS,"===(START) DELETE PROCESS===\n");
 
   KASSERT(p->p_addrspace != NULL);
   as_deactivate();
@@ -42,7 +42,9 @@ void sys__exit(int exitcode) {
 
 #ifdef OPT_A1 // Loop through children and delete them
 
+  spinlock_acquire(&p->p_lock);
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
+  spinlock_release(&curproc->p_lock);
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
     array_remove(p->p_children, 0);
@@ -70,7 +72,7 @@ void sys__exit(int exitcode) {
     spinlock_release(&p->p_lock);
     proc_destroy(p);
   } else {
-    DEBUG(DB_THREADS,"===(END) PROCESS MARKED TO EXIT\n");
+    DEBUG(DB_THREADS,"===(END) PROCESS MARKED TO EXIT===\n");
     p->p_exitstatus = P_exited;
     p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
@@ -90,7 +92,10 @@ int
 sys_fork(pid_t *retval, struct trapframe *tf)
 {
    struct proc *child = proc_create_runprogram("child");
+
+   spinlock_acquire(&curproc->p_lock);
    DEBUG(DB_THREADS,"===(START) FORK PROCESS: %d ===\n", child->p_pid);
+   spinlock_release(&curproc->p_lock);
 
    child->p_parent = curproc;
 
@@ -99,9 +104,10 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    struct trapframe *trapframe_for_child = kmalloc(sizeof(struct trapframe));
 
    *trapframe_for_child = *tf;
+   spinlock_acquire(&curproc->p_lock);
    DEBUG(DB_THREADS,"Parent TF epc: %d | v0: %d | mem: %p \n", tf->tf_epc, tf->tf_v0, tf);
    DEBUG(DB_THREADS,"Child TF  epc: %d | v0: %d | mem: %p \n", trapframe_for_child->tf_epc, trapframe_for_child->tf_v0, trapframe_for_child);
-
+   spinlock_release(&curproc->p_lock);
 
    as_copy(curproc_getas(), &child->p_addrspace);
 
@@ -114,7 +120,10 @@ sys_fork(pid_t *retval, struct trapframe *tf)
    *retval = child->p_pid;
 
    clocksleep(1);
+
+   spinlock_acquire(&curproc->p_lock);
    DEBUG(DB_THREADS,"===(END) FORK PROCESS==\n");
+   spinlock_release(&curproc->p_lock);
    return 0;
 }
 #endif
@@ -147,7 +156,11 @@ sys_waitpid(pid_t pid,
     }
 
   #ifdef OPT_A1
+
+    spinlock_acquire(&curproc->p_lock);
     DEBUG(DB_THREADS,"===(START) WAITING FOR PROCESS: %d===\n", pid);
+    spinlock_release(&curproc->p_lock);
+
     unsigned int idx = 0; // Stores the current index of the child we are looking for
     bool foundChild = false;
     struct proc *temp_child;
@@ -166,14 +179,14 @@ sys_waitpid(pid_t pid,
         return(-1);
     } else {
         spinlock_acquire(&temp_child->p_lock);
-        DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
+        DEBUG(DB_THREADS,"Found child %d, waiting for them to exit...\n", temp_child->p_pid);
         while (!temp_child->p_exitstatus == P_running) {
             spinlock_release(&temp_child->p_lock);
             clocksleep(1);
             spinlock_acquire(&temp_child->p_lock);
         }
-        spinlock_release(&temp_child->p_lock);
         DEBUG(DB_THREADS,"child has exited with an exist status of: %d\n", temp_child->p_exitcode);
+        spinlock_release(&temp_child->p_lock);
         exitstatus = _MKWAIT_EXIT(temp_child->p_exitcode);
         proc_destroy(temp_child);
 
@@ -194,7 +207,7 @@ sys_waitpid(pid_t pid,
   #endif
 
   result = copyout((void *)&exitstatus,status,sizeof(int));
-  DEBUG(DB_THREADS,"===(END) WAITING FOR PROCESS: %d===\n", pid);
+  // DEBUG(DB_THREADS,"===(END) WAITING FOR PROCESS: %d===\n", pid);
   if (result) {
     return(result);
   }
