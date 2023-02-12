@@ -186,7 +186,7 @@ void
 enter_forked_process(void* data1, unsigned long data2)
 {
     DEBUG(DB_THREADS,"Updates!\n");
-    DEBUG(DB_THREADS,"Entering the forked process, loc of data: %p \n", data1);
+    //DEBUG(DB_THREADS,"Entering the forked process, loc of data: %p \n", data1);
     DEBUG(DB_THREADS,"Updates!\n");
     (void)data2;
     DEBUG(DB_THREADS,"Updates!\n");
