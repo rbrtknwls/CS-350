@@ -63,7 +63,9 @@ void sys__exit(int exitcode) {
         DEBUG(DB_THREADS,"HH\n");
         spinlock_release(&temp_child->p_lock);
     }
+    DEBUG(DB_THREADS,"LOOP? \n");
   }
+  DEBUG(DB_THREADS,"LOOP \n");
 
 #endif
   /* detach this thread from its process */
