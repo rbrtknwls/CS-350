@@ -64,18 +64,18 @@ void sys__exit(int exitcode) {
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
 #ifdef OPT_A1
-  //spinlock_acquire(&p->p_lock);
-  /*
+  spinlock_acquire(&p->p_lock);
   if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+    DEBUG(DB_THREADS,"===(END) DELETE PROCESS===\n");
     spinlock_release(&p->p_lock);
     proc_destroy(p);
   } else {
+    DEBUG(DB_THREADS,"===(END) PROCESS MARKED TO EXIT\n");
     p->p_exitstatus = P_exited;
     p->p_exitcode = exitcode;
     spinlock_release(&p->p_lock);
-*/
-  proc_destroy(p);
-  DEBUG(DB_THREADS,"===(END) DELETE PROCESS===\n");
+  }
+
 #else
   proc_destroy(p);
 #endif
@@ -148,10 +148,10 @@ sys_waitpid(pid_t pid,
 
   #ifdef OPT_A1
     DEBUG(DB_THREADS,"===(START) WAITING FOR PROCESS: %d===\n", pid);
-    //unsigned int idx = 0; // Stores the current index of the child we are looking for
+    unsigned int idx = 0; // Stores the current index of the child we are looking for
     bool foundChild = false;
     struct proc *temp_child;
-    /*
+
     while (idx < curproc->p_children->num) {
         temp_child = array_get(curproc->p_children, idx);
         if (temp_child->p_pid == pid) {
@@ -159,7 +159,7 @@ sys_waitpid(pid_t pid,
             foundChild = true;
             break;
         }
-    }*/
+    }
     if (!foundChild) {
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
         exitstatus = _MKWAIT_EXIT(ECHILD);
