@@ -46,6 +46,7 @@ void sys__exit(int exitcode) {
   while (p->p_children->num != 0) {
     DEBUG(DB_THREADS,"AA\n");
     struct proc *temp_child = array_get(p->p_children, 0);
+    DEBUG(DB_THREADS,"BB %d \n", temp_child->p_pid);
     DEBUG(DB_THREADS,"BB\n");
     array_remove(p->p_children, 0);
     DEBUG(DB_THREADS,"CC\n");
