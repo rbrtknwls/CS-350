@@ -181,7 +181,9 @@ sys_waitpid(pid_t pid,
         spinlock_acquire(&temp_child->p_lock);
         DEBUG(DB_THREADS,"Found child %d, waiting for them to exit...\n", temp_child->p_pid);
         while (!temp_child->p_exitstatus == P_running) {
+
             spinlock_release(&temp_child->p_lock);
+            DEBUG(DB_THREADS,".");
             clocksleep(1);
             spinlock_acquire(&temp_child->p_lock);
         }
