@@ -189,7 +189,7 @@ enter_forked_process(void* data1, unsigned long data2)
     (void)data2;
     DEBUG(DB_THREADS,"Updates!\n");
     struct trapframe *tf = (struct trapframe*) data1;
-    struct trapframe tf_copy = *data1;
+    struct trapframe tf_copy = *tf;
     DEBUG(DB_THREADS,"COPIED TRAP FRAME\n");
     kfree(data1);
     DEBUG(DB_THREADS,"Freed data\n");
