@@ -172,6 +172,7 @@ sys_waitpid(pid_t pid,
             foundChild = true;
             break;
         }
+        idx++;
     }
     if (!foundChild) {
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
