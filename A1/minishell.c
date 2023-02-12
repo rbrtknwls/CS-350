@@ -167,6 +167,7 @@ int main(void)
                 waitpid(x, NULL, 0);
                 outcmd = NULL;
                 break;
+        }
 
 
 	}
