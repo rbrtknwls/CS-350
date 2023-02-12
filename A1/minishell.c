@@ -155,6 +155,7 @@ int main(void)
                  * handling errors.
                  */
 
+        int x;
         switch (x = fork()) {
             case -1:
                 perror("fork");
@@ -163,7 +164,7 @@ int main(void)
                 doexec();
                 break;
             default:
-                waitpid();
+                waitpid(x, NULL, 0);
                 outcmd = NULL;
                 break;
 
