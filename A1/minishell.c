@@ -122,7 +122,7 @@ void doexec(void) {
          * HINT: The command line arguments passed by
          * the user are found in char **av.
          */
-    pexecvp(av[0], av);
+    execvp(av[0], av);
 
 	perror(av[0]);
 	exit(1);
