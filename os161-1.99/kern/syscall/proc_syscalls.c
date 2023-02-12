@@ -67,7 +67,7 @@ void sys__exit(int exitcode) {
      will wake up the kernel menu thread */
 #ifdef OPT_A1
   spinlock_acquire(&p->p_lock);
-  if (p->parent == NULL || p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+  if (p->p_parent == NULL || p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     DEBUG(DB_THREADS,"===(END) DELETE PROCESS===\n");
     spinlock_release(&p->p_lock);
     proc_destroy(p);
