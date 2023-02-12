@@ -138,7 +138,6 @@ proc_destroy(struct proc *proc)
 
 	KASSERT(proc != NULL);
 	KASSERT(proc != kproc);
-	DEBUG(DB_THREADS,"deleting proc\n");
 
 	/*
 	 * We don't take p_lock in here because we must have the only
@@ -151,7 +150,6 @@ proc_destroy(struct proc *proc)
 		VOP_DECREF(proc->p_cwd);
 		proc->p_cwd = NULL;
 	}
-	DEBUG(DB_THREADS,"AA \n");
 
 
 #ifndef UW  // in the UW version, space destruction occurs in sys_exit, not here
@@ -173,28 +171,23 @@ proc_destroy(struct proc *proc)
 		as_destroy(as);
 	}
 #endif // UW
-    DEBUG(DB_THREADS,"BB \n");
 
 #ifdef UW
 	if (proc->console) {
 	  vfs_close(proc->console);
 	}
 #endif // UW
-    DEBUG(DB_THREADS,"CC \n");
 
 #ifdef OPT_A1
     array_destroy(proc->p_children);
     proc->p_parent = NULL;
 #endif
-    DEBUG(DB_THREADS,"DD \n");
 
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
 
 	kfree(proc->p_name);
-	DEBUG(DB_THREADS,"EE \n");
 	kfree(proc);
-	DEBUG(DB_THREADS,"FF \n");
 
 #ifdef UW
 	/* decrement the process count */

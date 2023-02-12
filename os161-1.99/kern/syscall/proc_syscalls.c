@@ -47,25 +47,16 @@ void sys__exit(int exitcode) {
     DEBUG(DB_THREADS,"AA\n");
     struct proc *temp_child = array_get(p->p_children, 0);
     DEBUG(DB_THREADS,"BB %d \n", temp_child->p_pid);
-    DEBUG(DB_THREADS,"BB\n");
     array_remove(p->p_children, 0);
-    DEBUG(DB_THREADS,"CC\n");
     spinlock_acquire(&temp_child->p_lock);
-    DEBUG(DB_THREADS,"DD\n");
     if (temp_child->p_exitstatus == P_exited) {
-        DEBUG(DB_THREADS,"EE\n");
         spinlock_release(&temp_child->p_lock);
-        DEBUG(DB_THREADS,"FF\n");
         proc_destroy(temp_child);
     } else {
-        DEBUG(DB_THREADS,"GG\n");
         temp_child->p_parent = NULL;
-        DEBUG(DB_THREADS,"HH\n");
         spinlock_release(&temp_child->p_lock);
     }
-    DEBUG(DB_THREADS,"LOOP? \n");
   }
-  DEBUG(DB_THREADS,"LOOP \n");
 
 #endif
   /* detach this thread from its process */
@@ -76,7 +67,7 @@ void sys__exit(int exitcode) {
      will wake up the kernel menu thread */
 #ifdef OPT_A1
   spinlock_acquire(&p->p_lock);
-  if (p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
+  if (p->parent == NULL || p->p_parent->p_exitstatus == P_exited) { // Process is no longer running
     DEBUG(DB_THREADS,"===(END) DELETE PROCESS===\n");
     spinlock_release(&p->p_lock);
     proc_destroy(p);
