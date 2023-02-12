@@ -122,7 +122,7 @@ void doexec(void) {
          * HINT: The command line arguments passed by
          * the user are found in char **av.
          */
-    printf("== %s ==\n", av[0]);
+    pexecvp(av[0], av);
 
 	perror(av[0]);
 	exit(1);
