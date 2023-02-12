@@ -44,9 +44,7 @@ void sys__exit(int exitcode) {
 
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
-    DEBUG(DB_THREADS,"AA\n");
     struct proc *temp_child = array_get(p->p_children, 0);
-    DEBUG(DB_THREADS,"BB %d \n", temp_child->p_pid);
     array_remove(p->p_children, 0);
     spinlock_acquire(&temp_child->p_lock);
     if (temp_child->p_exitstatus == P_exited) {
