@@ -98,6 +98,10 @@ void doexec(void) {
 				 * line to extract the next command
 				 * in the pipeline.
 				 */
+                dup2(pipefds[0], 0);
+                close(pipefds[0]);
+                close(pipefds[1]);
+
 				parseline(outcmd);
 				break;
 			default:
@@ -110,6 +114,10 @@ void doexec(void) {
 				 * The parent only needs to execute
 				 * the current command.
 				 */
+                dup2(pipefds[1], 1);
+                close(pipefds[0]);
+                close(pipefds[1]);
+
 				outcmd = NULL;
 				break;
 		}
