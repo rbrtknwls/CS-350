@@ -187,7 +187,7 @@ sys_waitpid(pid_t pid,
             clocksleep(1);
             spinlock_acquire(&temp_child->p_lock);
         }
-        DEBUG(DB_THREADS,"child has exited with an exist status of: %d\n", temp_child->p_exitcode);
+        DEBUG(DB_THREADS,"child has exited with an exit status of: %d\n", temp_child->p_exitcode);
         spinlock_release(&temp_child->p_lock);
         exitstatus = _MKWAIT_EXIT(temp_child->p_exitcode);
         proc_destroy(temp_child);
