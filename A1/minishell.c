@@ -156,7 +156,7 @@ int main(void)
                  */
 
         int x;
-        switch (x = fork()) {
+        /*switch (x = fork()) {
             case -1:
                 perror("fork");
                 exit(1);
@@ -167,7 +167,7 @@ int main(void)
                 waitpid(x, NULL, 0);
                 outcmd = NULL;
                 break;
-        }
+        }*/
 
 
 	}
