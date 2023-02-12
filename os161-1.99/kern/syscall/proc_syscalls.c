@@ -44,14 +44,22 @@ void sys__exit(int exitcode) {
 
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
+    DEBUG(DB_THREADS,"AA\n");
     struct proc *temp_child = array_get(p->p_children, 0);
+    DEBUG(DB_THREADS,"BB\n");
     array_remove(p->p_children, 0);
+    DEBUG(DB_THREADS,"CC\n");
     spinlock_acquire(&temp_child->p_lock);
+    DEBUG(DB_THREADS,"DD\n");
     if (temp_child->p_exitstatus == P_exited) {
+        DEBUG(DB_THREADS,"EE\n");
         spinlock_release(&temp_child->p_lock);
+        DEBUG(DB_THREADS,"FF\n");
         proc_destroy(temp_child);
     } else {
+        DEBUG(DB_THREADS,"GG\n");
         temp_child->p_parent = NULL;
+        DEBUG(DB_THREADS,"HH\n");
         spinlock_release(&temp_child->p_lock);
     }
   }
