@@ -163,6 +163,7 @@ sys_waitpid(pid_t pid,
     if (!foundChild) {
         DEBUG(DB_THREADS,"No child with pid: %d \n", pid);
         exitstatus = _MKWAIT_EXIT(ECHILD);
+        return(-1);
     } else {
         spinlock_acquire(&temp_child->p_lock);
         DEBUG(DB_THREADS,"Found child, waiting for them to exit...\n");
@@ -193,7 +194,7 @@ sys_waitpid(pid_t pid,
   #endif
 
   result = copyout((void *)&exitstatus,status,sizeof(int));
-   DEBUG(DB_THREADS,"===(END) WAITING FOR PROCESS: %d===\n", pid);
+  DEBUG(DB_THREADS,"===(END) WAITING FOR PROCESS: %d===\n", pid);
   if (result) {
     return(result);
   }
