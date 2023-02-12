@@ -41,7 +41,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
 
 #ifdef OPT_A1 // Loop through children and delete them
-  /*
+
   DEBUG(DB_THREADS,"Updating proc: %s's %d children\n", p->p_name, p->p_children->num);
   while (p->p_children->num != 0) {
     struct proc *temp_child = array_get(p->p_children, 0);
@@ -54,7 +54,7 @@ void sys__exit(int exitcode) {
         temp_child->p_parent = NULL;
         spinlock_release(&temp_child->p_lock);
     }
-  }*/
+  }
 
 #endif
   /* detach this thread from its process */
