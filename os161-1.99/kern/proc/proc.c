@@ -184,7 +184,7 @@ proc_destroy(struct proc *proc)
 
 #ifdef OPT_A1
     array_destroy(proc->p_children);
-
+    proc->p_parent = NULL;
 #endif
     DEBUG(DB_THREADS,"DD \n");
 
@@ -194,6 +194,7 @@ proc_destroy(struct proc *proc)
 	kfree(proc->p_name);
 	DEBUG(DB_THREADS,"EE \n");
 	kfree(proc);
+	DEBUG(DB_THREADS,"FF \n");
 
 #ifdef UW
 	/* decrement the process count */
