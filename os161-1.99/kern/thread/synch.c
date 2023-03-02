@@ -249,7 +249,10 @@ lock_do_i_hold(struct lock *lock)
 
 #ifdef OPT_A1
         KASSERT(lock != NULL);
-        return (lock->lk_owner->t_name == curthread->t_name);
+        if (lock->lk_owner == curthread) {
+            return true
+        }
+        return false;
 #endif
         (void)lock;  // suppress warning until code gets written
 
