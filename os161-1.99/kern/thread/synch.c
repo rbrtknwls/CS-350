@@ -225,7 +225,18 @@ lock_acquire(struct lock *lock)
 void
 lock_release(struct lock *lock)
 {
-        // Write this
+
+#ifdef OPT_A2
+        KASSERT(lock != NULL);
+        KASSERT(lock_do_i_hold(lock));
+
+        spinlock_acquire(&lock->lk_spnlk);
+        lock->lk_owner = NULL;
+        lock->lk_held = false;
+        wchan_wakeone(lock->lk_wchan);
+
+        spinlock_release(&lock->lk_spnlk);
+#endif
 
         (void)lock;  // suppress warning until code gets written
 }
@@ -235,6 +246,10 @@ lock_do_i_hold(struct lock *lock)
 {
         // Write this
 
+#ifdef OPT_A2
+        KASSERT(lock != NULL);
+        return (lock->lk_owner->t_name == curthread->t_name);
+#endif
         (void)lock;  // suppress warning until code gets written
 
         return true; // dummy until code gets written
