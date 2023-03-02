@@ -39,6 +39,7 @@
 #include <thread.h>
 #include <current.h>
 #include <synch.h>
+#include "opt-A2.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -162,8 +163,23 @@ lock_create(const char *name)
                 kfree(lock);
                 return NULL;
         }
-        
-        // add stuff here as needed
+
+#ifdef OPT_A2
+
+        lock->lk_wchan = wchan_create(lock->lk_name);
+        if (lock->lk_wchan == NULL) {
+            kfree(lock->lk_name);
+            kfree(lock);
+            return NULL;
+        }
+
+
+        spinlock_init(&lock->lk_spnlk);
+
+        lock->lk_owner = NULL;
+        lock->lk_held = false;
+
+#endif
         
         return lock;
 }
@@ -175,6 +191,11 @@ lock_destroy(struct lock *lock)
 
         // add stuff here as needed
         
+#ifdef OPT_A2
+        spinlock_cleanup(&lock->lk_spnlk);
+        wchan_destroy(lock->lk_wchan);
+#endif
+
         kfree(lock->lk_name);
         kfree(lock);
 }
