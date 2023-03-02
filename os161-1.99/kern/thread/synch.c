@@ -192,10 +192,10 @@ lock_destroy(struct lock *lock)
 
         // add stuff here as needed
 
-/*#ifdef OPT_A1
+#ifdef OPT_A1
         spinlock_cleanup(&lock->lk_spnlk);
         wchan_destroy(lock->lk_wchan);
-#endif*/
+#endif
 
         kfree(lock->lk_name);
         kfree(lock);
