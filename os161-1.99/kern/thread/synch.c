@@ -178,7 +178,7 @@ lock_create(const char *name)
         lock->lk_owner = NULL;
         lock->lk_held = false;
 
-*/#endif
+#endif*/
         
         return lock;
 }
