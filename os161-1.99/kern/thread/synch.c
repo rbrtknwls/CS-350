@@ -216,7 +216,7 @@ lock_acquire(struct lock *lock)
         }
         lock->lk_held = true;
         lock->lk_owner = curthread;
-        spinlock_release(lock->lk_spnlk);
+        spinlock_release(&lock->lk_spnlk);
 #endif
 
         (void)lock;  // suppress warning until code gets written
