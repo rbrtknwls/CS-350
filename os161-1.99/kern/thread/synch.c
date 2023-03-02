@@ -165,7 +165,7 @@ lock_create(const char *name)
                 return NULL;
         }
 
-/*#ifdef OPT_A1
+#ifdef OPT_A1
 
         lock->lk_wchan = wchan_create(lock->lk_name);
         if (lock->lk_wchan == NULL) {
@@ -180,7 +180,7 @@ lock_create(const char *name)
         lock->lk_owner = NULL;
         lock->lk_held = false;
 
-#endif*/
+#endif
         
         return lock;
 }
