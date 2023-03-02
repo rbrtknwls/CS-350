@@ -227,7 +227,7 @@ void
 lock_release(struct lock *lock)
 {
 
-#ifdef OPT_A2
+#ifdef OPT_A1
         KASSERT(lock != NULL);
         KASSERT(lock_do_i_hold(lock));
 
