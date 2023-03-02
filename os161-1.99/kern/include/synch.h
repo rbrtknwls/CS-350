@@ -74,12 +74,12 @@ void V(struct semaphore *);
  */
 struct lock {
         char *lk_name;
-//#ifdef OPT_A1
+#ifdef OPT_A1
         struct thread *lk_owner;
         volatile bool lk_held;
         struct wchan *lk_wchan;
         struct spinlock lk_spnlk;
-//#endif
+#endif
 };
 
 struct lock *lock_create(const char *name);

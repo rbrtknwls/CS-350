@@ -40,6 +40,8 @@
 #include <current.h>
 #include <synch.h>
 
+#include "opt-A1.h"
+
 ////////////////////////////////////////////////////////////
 //
 // Semaphore.
@@ -163,7 +165,7 @@ lock_create(const char *name)
                 return NULL;
         }
 
-/*#ifdef OPT_A2
+/*#ifdef OPT_A1
 
         lock->lk_wchan = wchan_create(lock->lk_name);
         if (lock->lk_wchan == NULL) {
@@ -190,7 +192,7 @@ lock_destroy(struct lock *lock)
 
         // add stuff here as needed
 
-/*#ifdef OPT_A2
+/*#ifdef OPT_A1
         spinlock_cleanup(&lock->lk_spnlk);
         wchan_destroy(lock->lk_wchan);
 #endif*/
@@ -203,7 +205,7 @@ void
 lock_acquire(struct lock *lock)
 {
 
-/*#ifdef OPT_A2
+/*#ifdef OPT_A1
         KASSERT(lock != NULL);
 
         spinlock_acquire(&lock->lk_spnlk);
