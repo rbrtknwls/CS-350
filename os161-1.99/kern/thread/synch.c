@@ -250,7 +250,7 @@ lock_do_i_hold(struct lock *lock)
 #ifdef OPT_A1
         KASSERT(lock != NULL);
         if (lock->lk_owner == curthread) {
-            return true
+            return true;
         }
         return false;
 #endif
