@@ -76,7 +76,7 @@ void V(struct semaphore *);
 struct lock {
         char *lk_name;
 #ifdef OPT_A2
-        struct thread lk_owner;
+        struct thread *lk_owner;
         bool lk_held;
         struct wchan *lk_wchan;
         struct spinlock lk_spnlk;

@@ -190,7 +190,7 @@ lock_destroy(struct lock *lock)
         KASSERT(lock != NULL);
 
         // add stuff here as needed
-        
+
 #ifdef OPT_A2
         spinlock_cleanup(&lock->lk_spnlk);
         wchan_destroy(lock->lk_wchan);
