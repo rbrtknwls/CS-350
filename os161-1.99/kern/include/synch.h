@@ -117,7 +117,7 @@ struct cv {
 #ifdef OPT_A2
         struct thread lk_owner;
         bool lk_held;
-        struct wchan lk_wchan;
+        struct wchan *lk_wchan;
         struct spinlock lk_spnlk;
 #endif
         // add what you need here
