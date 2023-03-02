@@ -207,12 +207,12 @@ lock_acquire(struct lock *lock)
 #ifdef OPT_A2
         KASSERT(lock != NULL);
 
-        spinlock_acquire(lock->lk_spnlk);
+        spinlock_acquire(&lock->lk_spnlk);
         while (lock->lk_held) {
             wchan_lock(lock->lk_wchan);
-            spinlock_release(lock->lk_spnlk)
+            spinlock_release(&lock->lk_spnlk)
             wchan_sleep(lock->lk_wchan);
-            spinlock_acquire(lock->lk_spnlk);
+            spinlock_acquire(&lock->lk_spnlk);
         }
         lock->lk_held = true;
         lock->lk_owner = curthread;
