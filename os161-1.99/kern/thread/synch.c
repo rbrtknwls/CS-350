@@ -203,7 +203,21 @@ lock_destroy(struct lock *lock)
 void
 lock_acquire(struct lock *lock)
 {
-        // Write this
+
+#ifdef OPT_A2
+        KASSERT(lock != NULL);
+
+        spinlock_acquire(lock->lk_spnlk)
+        while (lock->lk_held) {
+            wchan_lock(lock->wchan);
+            spinlock_release(lock->lk_spnlk)
+            wchan_sleep(lock->wchan)
+            spinlock_acquire(lock->lk_spnlk)
+        }
+        lock->lk_held = true;
+        lock->lk_owner = curthread;
+        spinlock_release(lock->lk_spnlk)
+#endif
 
         (void)lock;  // suppress warning until code gets written
 }
