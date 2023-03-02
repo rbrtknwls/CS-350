@@ -190,10 +190,10 @@ lock_destroy(struct lock *lock)
 
         // add stuff here as needed
 
-//#ifdef OPT_A2
+/*#ifdef OPT_A2
         spinlock_cleanup(&lock->lk_spnlk);
         wchan_destroy(lock->lk_wchan);
-//#endif
+#endif*/
 
         kfree(lock->lk_name);
         kfree(lock);
@@ -203,7 +203,7 @@ void
 lock_acquire(struct lock *lock)
 {
 
-//#ifdef OPT_A2
+/*#ifdef OPT_A2
         KASSERT(lock != NULL);
 
         spinlock_acquire(&lock->lk_spnlk);
@@ -216,7 +216,7 @@ lock_acquire(struct lock *lock)
         lock->lk_held = true;
         lock->lk_owner = curthread;
         spinlock_release(&lock->lk_spnlk);
-//#endif
+*/#endif
 
         (void)lock;  // suppress warning until code gets written
 }
@@ -225,7 +225,7 @@ void
 lock_release(struct lock *lock)
 {
 
-//#ifdef OPT_A2
+/*#ifdef OPT_A2
         KASSERT(lock != NULL);
         KASSERT(lock_do_i_hold(lock));
 
@@ -235,7 +235,7 @@ lock_release(struct lock *lock)
         wchan_wakeone(lock->lk_wchan);
 
         spinlock_release(&lock->lk_spnlk);
-//#endif
+#endif*/
 
         (void)lock;  // suppress warning until code gets written
 }
@@ -245,10 +245,10 @@ lock_do_i_hold(struct lock *lock)
 {
         // Write this
 
-//#ifdef OPT_A2
+/*#ifdef OPT_A2
         KASSERT(lock != NULL);
         return (lock->lk_owner->t_name == curthread->t_name);
-//#endif
+#endif*/
         (void)lock;  // suppress warning until code gets written
 
         return true; // dummy until code gets written
