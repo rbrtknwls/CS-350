@@ -57,7 +57,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
     /* XXX FILLMEIN
      * Also feel free to remove the printf statement
      * to improve time */
-  pthread_t threads[NUM_THREADS];
+  pthread_t threads[lib->numArticles];
 
   input argu[lib->numArticles];
 
@@ -72,7 +72,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
 
   int sum = 0;
   for (int i = 0; i < lib->numArticles; i++) {
-      pthread_join(p, NULL);
+      pthread_join(&threads[i], NULL);
 
       sum += argu[i].sum;
   }
