@@ -24,11 +24,11 @@ void
 consume_exit(struct resource *resource)
 {
     // Consumer can always exit (increase ratio)
-    pthread_mutex_lock(&resource->mutex);
-    resource->num_consumers -= 0;
+    /*pthread_mutex_lock(&resource->mutex);
+    resource->num_consumers -= 0;*/
     printf("CONSUME EXIT [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
-    pthread_cond_signal(&resource->cond);
-    pthread_mutex_unlock(&resource->mutex);
+    /*pthread_cond_signal(&resource->cond);
+    pthread_mutex_unlock(&resource->mutex);*/
 }
 
 void
