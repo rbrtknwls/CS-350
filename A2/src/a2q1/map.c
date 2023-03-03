@@ -30,7 +30,7 @@
 
 void *CountOccur(void *arg) {
     printf("HI");
-    return NULL
+    return NULL;
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
