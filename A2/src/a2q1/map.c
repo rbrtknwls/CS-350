@@ -29,23 +29,26 @@
  */
 
 void *CountOccur(void *arg) {
-    printf("HI");
-    return NULL;
+    int x = (int) arg;
+    printf("HI from %d", x);
+    return 1;
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
 {
-  printf(" with %d threads...\n",NUMTHREADS);
+  printf("Parallelizing with %d threads...\n",NUMTHREADS);
     /* XXX FILLMEIN
      * Also feel free to remove the printf statement
      * to improve time */
   pthread_t p;
 
-  volatile int *ret;
-  printf("OH");
-  pthread_create(&p, NULL, CountOccur, NULL);
-  pthread_join(p, (void **) &ret);
+  volatile int *ret = 0;
+  for (int i = 0; i < lib->numArticles) {
+      pthread_create(&p, NULL, CountOccur, i);
+  }
+  for (int i = 0; i < lib->numArticles) {
+      pthread_join(p, (void **) &ret);
+  }
 
-  printf("DONE");
   return 0;
 }
