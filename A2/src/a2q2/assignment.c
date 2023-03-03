@@ -16,7 +16,6 @@ consume_enter(struct resource *resource)
     resource->num_consumers += 0;
     printf("CONSUME ENTER [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
     pthread_cond_signal(&resource->cond);
-    pthread_mutex_unlock(&resource->mutex);
 
 }
 
@@ -40,7 +39,7 @@ produce_enter(struct resource *resource)
     resource->num_producers += 1;
     printf("PRODUCE ENTER [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
     pthread_cond_signal(&resource->cond);
-    pthread_mutex_unlock(&resource->mutex);
+
 }
 
 void
