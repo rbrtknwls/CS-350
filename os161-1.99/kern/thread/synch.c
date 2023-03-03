@@ -252,7 +252,7 @@ lock_do_i_hold(struct lock *lock)
         if (lock->lk_owner == curthread) {
             return true;
         }
-        return true;
+        return false;
 #endif
         (void)lock;  // suppress warning until code gets written
 
