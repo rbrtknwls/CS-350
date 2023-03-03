@@ -207,7 +207,7 @@ lock_acquire(struct lock *lock)
 
 #ifdef OPT_A1
         KASSERT(lock != NULL);
-
+        KASSERT(lock->lk_held == false)
         spinlock_acquire(&lock->lk_spnlk);
         while (lock->lk_held) {
             wchan_lock(lock->lk_wchan);
@@ -281,6 +281,16 @@ cv_create(const char *name)
         }
         
         // add stuff here as needed
+#ifdef OPT_A1
+
+        cv->cv_wchan = wchan_create(cv->cv_name);
+        if (cv->cv_wchan == NULL) {
+            kfree(cv->cv_name);
+            kfree(cv);
+            return NULL;
+        }
+
+#endif
         
         return cv;
 }
@@ -291,7 +301,9 @@ cv_destroy(struct cv *cv)
         KASSERT(cv != NULL);
 
         // add stuff here as needed
-        
+#ifdef OPT_A1
+        wchan_destroy(lock->lk_wchan);
+#endif
         kfree(cv->cv_name);
         kfree(cv);
 }
@@ -299,6 +311,17 @@ cv_destroy(struct cv *cv)
 void
 cv_wait(struct cv *cv, struct lock *lock)
 {
+#ifdef OPT_A1
+        KASSERT(cv != NULL);
+        KASSERT(lock != NULL);
+        KASSERT(lock_do_i_hold(lock))
+
+		wchan_lock(cv->cv_wchan);
+		spinlock_release(&lock->lk_spnlk);
+        wchan_sleep(sem->cv_wchan);
+		spinlock_acquire(&lock->lk_spnlk);
+#endif
+
         // Write this
         (void)cv;    // suppress warning until code gets written
         (void)lock;  // suppress warning until code gets written
@@ -307,6 +330,15 @@ cv_wait(struct cv *cv, struct lock *lock)
 void
 cv_signal(struct cv *cv, struct lock *lock)
 {
+
+#ifdef OPT_A1
+        KASSERT(cv != NULL);
+        KASSERT(lock != NULL);
+        KASSERT(lock_do_i_hold(lock))
+
+        wchan_wakeone(cv->cv_wchan);
+#endif
+
         // Write this
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
@@ -315,6 +347,15 @@ cv_signal(struct cv *cv, struct lock *lock)
 void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
+
+#ifdef OPT_A1
+        KASSERT(cv != NULL);
+        KASSERT(lock != NULL);
+        KASSERT(lock_do_i_hold(lock))
+
+        wchan_wakeall(cv->cv_wchan);
+#endif
+
 	// Write this
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
