@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-bool isBelowRatio(long num_consumers, long num_producers, int ratio;) {
+bool isBelowRatio(long num_consumers, long num_producers, int ratio) {
     return num_consumers > num_producers * ratio;
 }
 
