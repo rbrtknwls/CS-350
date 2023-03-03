@@ -29,7 +29,7 @@
  */
 
 typedef struct { struct Article * art; char * word; } input;
-typedef struct { int a } output;
+typedef struct { int a; } output;
 
 
 void *CountOccur(void *arg) {
