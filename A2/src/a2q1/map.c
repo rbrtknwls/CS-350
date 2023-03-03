@@ -35,7 +35,7 @@ void *CountOccur(void *arg) {
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
 {
-  printf("Parallelizing with %d threads...\n",NUMTHREADS);
+  printf(" with %d threads...\n",NUMTHREADS);
     /* XXX FILLMEIN
      * Also feel free to remove the printf statement
      * to improve time */
