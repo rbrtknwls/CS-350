@@ -29,8 +29,8 @@
  */
 
 void *CountOccur(void *arg) {
-    int x = (int) arg;
-    printf("HI from %d", x);
+    int *x = (int *) arg;
+    printf("HI from %d", &x);
     return 1;
 }
 
@@ -43,10 +43,10 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   pthread_t p;
 
   volatile int *ret = 0;
-  for (int i = 0; i < lib->numArticles) {
-      pthread_create(&p, NULL, CountOccur, i);
+  for (int i = 0; i < lib->numArticles; i++) {
+      pthread_create(&p, NULL, CountOccur, &i);
   }
-  for (int i = 0; i < lib->numArticles) {
+  for (int i = 0; i < lib->numArticles; i++) {
       pthread_join(p, (void **) &ret);
   }
 
