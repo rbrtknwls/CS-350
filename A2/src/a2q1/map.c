@@ -41,7 +41,7 @@ void *CountOccur(void *arg) {
     {
         // Get the length of the function.
         size_t len = strnlen( args->art->words[j], MAXWORDSIZE );
-        if ( !strncmp( args->art->words[j], word, len ) )
+        if ( !strncmp( args->art->words[j], arg->word, len ) )
         {
             wordCount += 1;
         }
