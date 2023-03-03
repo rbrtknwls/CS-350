@@ -29,7 +29,6 @@
  */
 
 typedef struct { struct Article * art; char * word; int sum; } input;
-typedef struct { int a; } output;
 
 
 void *CountOccur(void *arg) {
@@ -49,7 +48,7 @@ void *CountOccur(void *arg) {
 
     args->sum = wordCount;
 
-    return rvals;
+    pthread_exit(NULL)
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
@@ -58,7 +57,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
     /* XXX FILLMEIN
      * Also feel free to remove the printf statement
      * to improve time */
-  pthread_t p;
+  pthread_t threads[NUM_THREADS];
 
   input argu[lib->numArticles];
 
@@ -68,12 +67,13 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   }
 
   for (int i = 0; i < lib->numArticles; i++) {
-      pthread_create(&p, NULL, CountOccur, &argu[i]);
-      pthread_join(p, NULL);
+      pthread_create(&threads[i], NULL, CountOccur, &argu[i]);
   }
 
   int sum = 0;
   for (int i = 0; i < lib->numArticles; i++) {
+      pthread_join(p, NULL);
+
       sum += argu[i].sum;
   }
 
