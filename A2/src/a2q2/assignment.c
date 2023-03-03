@@ -24,7 +24,7 @@ void
 consume_exit(struct resource *resource)
 {
     // Consumer can always exit (increase ratio)
-    printf("CONSUME EXIT [p: %ld, c: %ld]\n", resource->num_consumers,  resource->num_producers);
+    printf("CONSUME EXIT [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
     pthread_mutex_lock(&resource->mutex);
     resource->num_consumers -= 1;
     pthread_cond_signal(&resource->cond);
@@ -35,7 +35,7 @@ void
 produce_enter(struct resource *resource)
 {
     // Producers can always enter (increase ratio)
-    printf("PRODUCE ENTER [p: %ld, c: %ld]\n", resource->num_consumers,  resource->num_producers);
+    printf("PRODUCE ENTER [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
     // FILL ME IN
     pthread_mutex_lock(&resource->mutex);
     resource->num_producers += 1;
@@ -46,7 +46,7 @@ produce_enter(struct resource *resource)
 void
 produce_exit(struct resource *resource)
 {
-    printf("PRODUCE EXIT [p: %ld, c: %ld]\n", resource->num_consumers,  resource->num_producers);
+    printf("PRODUCE EXIT [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
     /*pthread_mutex_lock(&resource->mutex);
 
     if (isBelowRatio(resource))
