@@ -73,7 +73,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   }
 
     for (int i = 0; i < lib->numArticles; i++) {
-        printf("The %dth article has %d words", i, argu[i]->sum);
+        printf("The %dth article has %d words", i, argu[i].sum);
     }
 
 
