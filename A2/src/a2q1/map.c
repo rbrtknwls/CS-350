@@ -28,7 +28,7 @@
  * --------------------------------------------------------------------
  */
 
-typedef struct { struct Article * art; char * word, int sum; } input;
+typedef struct { struct Article * art; char * word; int sum; } input;
 typedef struct { int a; } output;
 
 
@@ -59,7 +59,6 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
      * Also feel free to remove the printf statement
      * to improve time */
   pthread_t p;
-  volatile output *ret = {0};
 
   input argu[lib->numArticles];
 
