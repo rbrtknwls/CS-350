@@ -30,7 +30,7 @@
 
 void *CountOccur(void *arg) {
     int *x = (int *) arg;
-    printf("HI from %d", &x);
+    printf("HI from %d \n", *x);
     return 1;
 }
 
