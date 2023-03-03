@@ -11,7 +11,7 @@ consume_enter(struct resource *resource)
 {
     // FILL ME IN
     pthread_mutex_lock(&resource->mutex);
-    if (isBelowRatio(resource->num_consumers + 1, resource->num_producers, resource->ratio))
+    while (isBelowRatio(resource->num_consumers + 1, resource->num_producers, resource->ratio))
         pthread_cond_wait(&resource->cond, &resource->mutex);
     resource->num_consumers += 1;
     printf("CONSUME ENTER [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
@@ -45,7 +45,7 @@ void
 produce_exit(struct resource *resource)
 {
 
-    if (isBelowRatio(resource->num_consumers, resource->num_producers - 1, resource->ratio))
+    while (isBelowRatio(resource->num_consumers, resource->num_producers - 1, resource->ratio))
         pthread_cond_wait(&resource->cond, &resource->mutex);
     resource->num_producers -= 1;
     printf("PRODUCE EXIT [c: %ld, p: %ld]\n", resource->num_consumers,  resource->num_producers);
