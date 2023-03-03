@@ -28,7 +28,7 @@
  * --------------------------------------------------------------------
  */
 
-typedef struct { Article * art; char * word; } input;
+typedef struct { struct Article * art; char * word; } input;
 typedef struct { int a } output;
 
 
