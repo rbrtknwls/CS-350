@@ -11,7 +11,7 @@ consume_enter(struct resource *resource)
 {
     // FILL ME IN
     pthread_mutex_lock(&resource->mutex);
-    while (isBelowRatio(resource->num_consumers, resource->num_producers, resource->ratio))
+    while (isBelowRatio(resource->num_consumers + 1, resource->num_producers, resource->ratio))
         pthread_cond_wait(&resource->cond, &resource->mutex);
     printf("CONSUME ENTER [p: %ld, c: %ld]\n", resource->num_consumers,  resource->num_producers);
     resource->num_consumers += 1;
