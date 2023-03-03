@@ -47,7 +47,7 @@ void *CountOccur(void *arg) {
         }
     }
 
-    printf("Num words is: %dd \n", wordCount);
+    printf("Num words is: %ld \n", wordCount);
 
     return rvals;
 }
