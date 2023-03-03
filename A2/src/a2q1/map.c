@@ -40,7 +40,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
      * to improve time */
   pthread_t p;
 
-  Pthread_create(&p, NULL, CountOccur, NULL);
-  
+  pthread_create(&p, NULL, CountOccur, NULL);
+
   return 0;
 }
