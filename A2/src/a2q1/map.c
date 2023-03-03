@@ -28,10 +28,17 @@
  * --------------------------------------------------------------------
  */
 
+typedef struct { Article * art; char * word; } input;
+typedef struct { int a } output;
+
+
 void *CountOccur(void *arg) {
-    int *x = (int *) arg;
-    printf("HI from %d \n", *x);
-    return 1;
+    input *args = (input *) arg;
+    output *rvals = Malloc(sizeof(output));
+
+    printf("HI from %d \n, word is %s", *x, args->word);
+
+    return output;
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
@@ -41,10 +48,11 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
      * Also feel free to remove the printf statement
      * to improve time */
   pthread_t p;
+  volatile output *ret = {0};
 
-  volatile int *ret = 0;
   for (int i = 0; i < lib->numArticles; i++) {
-      pthread_create(&p, NULL, CountOccur, &i);
+      input args = {lib->articles[i], word};
+      pthread_create(&p, NULL, CountOccur, &args);
   }
   for (int i = 0; i < lib->numArticles; i++) {
       pthread_join(p, (void **) &ret);
