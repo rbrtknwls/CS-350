@@ -316,12 +316,13 @@ cv_wait(struct cv *cv, struct lock *lock)
         KASSERT(lock != NULL);
         KASSERT(lock_do_i_hold(lock));
 
-/*
+        panic("WAIT RUNS")
 		wchan_lock(cv->cv_wchan);
 		spinlock_release(&lock->lk_spnlk);
         wchan_sleep(cv->cv_wchan);
 		spinlock_acquire(&lock->lk_spnlk);
-		*/
+
+
 #endif
 
         // Write this
