@@ -317,7 +317,7 @@ cv_wait(struct cv *cv, struct lock *lock)
         KASSERT(lock_do_i_hold(lock));
 
 		wchan_lock(cv->cv_wchan);
-		panic("LOCK AND LOCK: %p | %p", lock->lk_spnlk, curthread);
+		panic("LOCK AND LOCK: %p | %p", &lock->lk_spnlk, curthread);
 		spinlock_release(&lock->lk_spnlk);
         wchan_sleep(cv->cv_wchan);
 		spinlock_acquire(&lock->lk_spnlk);
