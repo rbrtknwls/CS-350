@@ -34,11 +34,11 @@ typedef struct { int a } output;
 
 void *CountOccur(void *arg) {
     input *args = (input *) arg;
-    output *rvals = Malloc(sizeof(output));
+    output *rvals = malloc(sizeof(output));
 
-    printf("HI from %d \n, word is %s", *x, args->word);
+    printf("HI word is %s", args->word);
 
-    return output;
+    return rvals;
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
