@@ -1,5 +1,7 @@
 #include "assignment.h"
 #include <stdbool.h>
+#include <stdio.h>
+
 bool isBelowRatio(struct resource *resource) {
     return resource->num_consumers > resource->num_producers * resource->ratio;
 }
