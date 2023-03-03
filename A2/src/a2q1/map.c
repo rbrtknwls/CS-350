@@ -61,9 +61,14 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   pthread_t p;
   volatile output *ret = {0};
 
+  input args[lib->numArticles];
+
   for (int i = 0; i < lib->numArticles; i++) {
-      input args = {lib->articles[i], word};
-      pthread_create(&p, NULL, CountOccur, &args);
+      args[i] = lib->articles[i], word}
+  }
+
+  for (int i = 0; i < lib->numArticles; i++) {
+      pthread_create(&p, NULL, CountOccur, &args[i]);
   }
   for (int i = 0; i < lib->numArticles; i++) {
       pthread_join(p, (void **) &ret);
