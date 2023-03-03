@@ -42,6 +42,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   pthread_t p;
 
   volatile int *ret;
+  printf("OH");
   pthread_create(&p, NULL, CountOccur, NULL);
   pthread_join(p, (void **) &ret);
 
