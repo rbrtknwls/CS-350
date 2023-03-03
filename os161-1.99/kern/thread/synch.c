@@ -302,7 +302,7 @@ cv_destroy(struct cv *cv)
 
         // add stuff here as needed
 #ifdef OPT_A1
-        wchan_destroy(lock->lk_wchan);
+        wchan_destroy(cv->cv_wchan);
 #endif
         kfree(cv->cv_name);
         kfree(cv);
@@ -314,7 +314,7 @@ cv_wait(struct cv *cv, struct lock *lock)
 #ifdef OPT_A1
         KASSERT(cv != NULL);
         KASSERT(lock != NULL);
-        KASSERT(lock_do_i_hold(lock))
+        KASSERT(lock_do_i_hold(lock));
 
 		wchan_lock(cv->cv_wchan);
 		spinlock_release(&lock->lk_spnlk);
@@ -334,7 +334,7 @@ cv_signal(struct cv *cv, struct lock *lock)
 #ifdef OPT_A1
         KASSERT(cv != NULL);
         KASSERT(lock != NULL);
-        KASSERT(lock_do_i_hold(lock))
+        KASSERT(lock_do_i_hold(lock));
 
         wchan_wakeone(cv->cv_wchan);
 #endif
@@ -351,7 +351,7 @@ cv_broadcast(struct cv *cv, struct lock *lock)
 #ifdef OPT_A1
         KASSERT(cv != NULL);
         KASSERT(lock != NULL);
-        KASSERT(lock_do_i_hold(lock))
+        KASSERT(lock_do_i_hold(lock));
 
         wchan_wakeall(cv->cv_wchan);
 #endif
