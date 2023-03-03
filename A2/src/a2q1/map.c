@@ -36,7 +36,7 @@ void *CountOccur(void *arg) {
     input *args = (input *) arg;
     output *rvals = malloc(sizeof(output));
 
-    printf("HI word is %d", args->Article->numWords);
+    printf("HI word is %d", args->art->numWords);
 
     return rvals;
 }
