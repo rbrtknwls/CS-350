@@ -11,7 +11,7 @@ consume_enter(struct resource *resource)
 void
 consume_exit(struct resource *resource)
 {
-    // FILL ME IN
+    // Consumer can always exit
 
     resource->num_consumers -= 1;
 }
@@ -19,7 +19,9 @@ consume_exit(struct resource *resource)
 void
 produce_enter(struct resource *resource)
 {
+    // Producers can
     // FILL ME IN
+    resource->num_producers += 1;
 
 }
 
@@ -27,6 +29,7 @@ void
 produce_exit(struct resource *resource)
 {
     // FILL ME IN
+    resource->num_consumers -= 1;
 
 }
 
