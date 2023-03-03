@@ -36,7 +36,18 @@ void *CountOccur(void *arg) {
     input *args = (input *) arg;
     output *rvals = malloc(sizeof(output));
 
-    printf("HI word is %d", args->art->numWords);
+    size_t wordCount = 0;
+    for ( unsigned int j = 0; j < args->art->numWords; j++)
+    {
+        // Get the length of the function.
+        size_t len = strnlen( args->art->words[j], MAXWORDSIZE );
+        if ( !strncmp( args->art->words[j], word, len ) )
+        {
+            wordCount += 1;
+        }
+    }
+
+    printf("Num words is: %dd \n", wordCount);
 
     return rvals;
 }
