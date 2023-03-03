@@ -35,12 +35,12 @@ void
 produce_enter(struct resource *resource)
 {
     // Producers can always enter (increase ratio)
-    printf("PRODUCE ENTER [p: %ld, c: %ld]\b", resource->num_consumers,  resource->num_producers);
+    printf("PRODUCE ENTER [p: %ld, c: %ld]\n", resource->num_consumers,  resource->num_producers);
     // FILL ME IN
-    /*pthread_mutex_lock(&resource->mutex);
+    pthread_mutex_lock(&resource->mutex);
     resource->num_producers += 1;
     pthread_cond_signal(&resource->cond);
-    pthread_mutex_unlock(&resource->mutex);*/
+    pthread_mutex_unlock(&resource->mutex);
 }
 
 void
