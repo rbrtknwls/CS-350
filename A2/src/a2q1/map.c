@@ -64,7 +64,7 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   input args[lib->numArticles];
 
   for (int i = 0; i < lib->numArticles; i++) {
-      args[i] = {lib->articles[i], word};
+      args[i] = input(lib->articles[i], word);
   }
 
   for (int i = 0; i < lib->numArticles; i++) {
