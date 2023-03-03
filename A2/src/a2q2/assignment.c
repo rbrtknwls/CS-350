@@ -48,7 +48,6 @@ produce_exit(struct resource *resource)
 {
 
     pthread_mutex_lock(&resource->mutex);
-    printf("AHHH");
     if (isBelowRatio(resource->num_consumers, resource->num_producers, resource->ratio))
         pthread_cond_wait(&resource->cond, &resource->mutex);
     resource->num_producers -= 1;

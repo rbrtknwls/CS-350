@@ -82,7 +82,7 @@ consume(void *data)
 		compute();
 
 		pthread_mutex_lock(&resource->mutex);
-
+        printf("AHHH");
 		consume_exit(resource);
 
 		/* Wait for a bit. */
