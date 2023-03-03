@@ -33,7 +33,6 @@ typedef struct { struct Article * art; char * word; int sum; } input;
 
 void *CountOccur(void *arg) {
     input *args = (input *) arg;
-    output *rvals = malloc(sizeof(output));
 
     size_t wordCount = 0;
     for ( unsigned int j = 0; j < args->art->numWords; j++)
@@ -48,7 +47,7 @@ void *CountOccur(void *arg) {
 
     args->sum = wordCount;
 
-    pthread_exit(NULL)
+    pthread_exit(NULL);
 }
 
 size_t MultithreadedWordCount( struct  Library * lib, char * word)
@@ -67,12 +66,12 @@ size_t MultithreadedWordCount( struct  Library * lib, char * word)
   }
 
   for (int i = 0; i < lib->numArticles; i++) {
-      pthread_create(&threads[i], NULL, CountOccur, &argu[i]);
+      pthread_create(threads[i], NULL, CountOccur, &argu[i]);
   }
 
   int sum = 0;
   for (int i = 0; i < lib->numArticles; i++) {
-      pthread_join(&threads[i], NULL);
+      pthread_join(threads[i], NULL);
 
       sum += argu[i].sum;
   }
