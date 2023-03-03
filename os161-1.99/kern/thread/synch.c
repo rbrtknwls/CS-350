@@ -207,7 +207,7 @@ lock_acquire(struct lock *lock)
 
 #ifdef OPT_A1
         KASSERT(lock != NULL);
-        KASSERT(lock->lk_held == false)
+        KASSERT(lock->lk_held == false);
         spinlock_acquire(&lock->lk_spnlk);
         while (lock->lk_held) {
             wchan_lock(lock->lk_wchan);
