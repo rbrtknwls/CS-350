@@ -74,7 +74,6 @@ runprogram(int argc, char *args[])
 	/* Open the file. */
 	result = vfs_open(progname, O_RDONLY, 0, &v);
 
-	kfree(argv);
 
 	if (result) {
 		return result;
@@ -113,9 +112,10 @@ runprogram(int argc, char *args[])
 	}
 
 	/* Warp to user mode. */
-	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
+	enter_new_process(argc /*argc*/, argv /*userspace addr of argv*/,
 			  stackptr, entrypoint);
-	
+
+	kfree(argv);
 	/* enter_new_process does not return. */
 	panic("enter_new_process returned\n");
 	return EINVAL;
