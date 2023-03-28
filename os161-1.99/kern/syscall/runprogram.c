@@ -45,7 +45,7 @@
 #include <syscall.h>
 #include <test.h>
 
-vaddr_t argcopy_out (vaddr_t &pointer, char* str) {
+vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
     pointer -= 8;
     copyout(pointer, 8);
@@ -64,7 +64,6 @@ int
 runprogram(int argc, char *args[])
 {
     char *progname;
-    char **argv = kmalloc(argc * sizeof(char *));
 
     strcpy(args[0], progname);
 
@@ -72,10 +71,6 @@ runprogram(int argc, char *args[])
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
 	int result;
-
-	for (int i = 0; i < argc; i++) {
-        argv[i] = argcopy_out(stackptr, args[i]);
-	}
 
 	/* Open the file. */
 	result = vfs_open(progname, O_RDONLY, 0, &v);
@@ -116,6 +111,12 @@ runprogram(int argc, char *args[])
 		/* p_addrspace will go away when curproc is destroyed */
 		return result;
 	}
+
+    for (int i = 0; i < argc; i++) {
+        argv[i] = argcopy_out(stackptr, args[i]);
+    }
+    char **argv = kmalloc(argc * sizeof(char *));
+
 
 	/* Warp to user mode. */
 	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
