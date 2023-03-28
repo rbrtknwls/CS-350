@@ -49,7 +49,7 @@
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
     pointer -= 8;
-    copyout(pointer, 8);
+    copyout(pointer, str, 8);
 
     return pointer;
 
@@ -113,10 +113,11 @@ runprogram(int argc, char *args[])
 		return result;
 	}
 
-    for (int i = 0; i < argc; i++) {
-        argv[i] = argcopy_out(stackptr, args[i]);
-    }
     char **argv = kmalloc(argc * sizeof(char *));
+    for (int i = 0; i < argc; i++) {
+        argv[i] = argcopy_out(&stackptr, args[i]);
+    }
+
 
 
 	/* Warp to user mode. */
