@@ -30,6 +30,8 @@
 #ifndef _TEST_H_
 #define _TEST_H_
 
+#include "opt-A3.h"
+
 /*
  * Declarations for test code and other miscellaneous high-level
  * functions.
@@ -82,8 +84,12 @@ int mallocstress(int, char **);
 int nettest(int, char **);
 
 /* Routine for running a user-level program. */
+#ifdef OPT_A3
 int runprogram(int argc, char *argv[]);
 vaddr_t argcopy_out (vaddr_t *pointer, char* str);
+#else
+int runprogram(char *progname);
+#endif
 
 /* Kernel menu system. */
 void menu(char *argstr);

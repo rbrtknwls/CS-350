@@ -45,7 +45,7 @@
 #include "opt-synchprobs.h"
 #include "opt-sfs.h"
 #include "opt-net.h"
-
+#include "opt-A3.h"
 /*
  * In-kernel menu and command dispatcher.
  */
@@ -102,7 +102,12 @@ cmd_progthread(void *ptr, unsigned long nargs)
 
 	strcpy(progname, args[0]);
 
-	result = runprogram(nargs, args);
+	#ifdef OPT_A3
+    result = runprogram(nargs, args);
+    #else
+    result = runprogram(progname);
+    #endif
+
 	if (result) {
 		kprintf("Running program %s failed: %s\n", args[0],
 			strerror(result));
@@ -132,7 +137,8 @@ common_prog(int nargs, char **args)
 	int result;
 
 #if OPT_SYNCHPROBS
-
+	kprintf("Warning: this probably won't work with a "
+		"synchronization-problems kernel.\n");
 #endif
 
 	/* Create a process for the new program to run in. */
@@ -143,7 +149,6 @@ common_prog(int nargs, char **args)
 
 	result = thread_fork(args[0] /* thread name */,
 			proc /* new process */,
-
 			cmd_progthread /* thread function */,
 			args /* thread arg */, nargs /* thread arg */);
 	if (result) {
