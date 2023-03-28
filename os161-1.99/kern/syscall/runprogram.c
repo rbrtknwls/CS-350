@@ -44,6 +44,7 @@
 #include <vfs.h>
 #include <syscall.h>
 #include <test.h>
+#include <copyinout.h>
 
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
