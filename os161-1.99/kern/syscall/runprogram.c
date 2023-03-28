@@ -46,13 +46,17 @@
 #include <test.h>
 #include <copyinout.h>
 
+#include "opt-A3.h"
+
+#ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
     pointer -= 8;
-    copyout(str, pointer, 8);
+    copyout(str, (userprt_t) pointer, 8);
 
     return *pointer;
 }
+#endif
 
 /*
  * Load program "progname" and start running it in usermode.
@@ -64,7 +68,6 @@ int
 runprogram(int argc, char *args[])
 {
     char *progname;
-
     strcpy(args[0], progname);
 
 	struct addrspace *as;
