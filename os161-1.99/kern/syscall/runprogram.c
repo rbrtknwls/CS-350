@@ -52,8 +52,10 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(char *progname)
+runprogram(int argc, char *argv[])
 {
+    char *progname;
+    strcpy(args[0], progname);
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
