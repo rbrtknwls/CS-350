@@ -58,6 +58,8 @@ runprogram(int argc, char *argv[])
 
     strcpy(argv[0], progname);
 
+    argc = 0;
+
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
