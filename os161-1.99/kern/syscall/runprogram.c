@@ -48,7 +48,7 @@
 
 vaddr_t argcopy_out (vaddr_t *newLoc, char* oldLoc) {
 
-    pointer -= 8;
+    newLoc -= 8;
     copyout(oldLoc, *newLoc, 8);
 
     return pointer;
