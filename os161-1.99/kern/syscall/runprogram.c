@@ -46,10 +46,10 @@
 #include <test.h>
 #include <copyinout.h>
 
-vaddr_t argcopy_out (vaddr_t newLoc, char* oldLoc) {
+vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
-    newLoc -= 8;
-    copyout(oldLoc, newLoc, 8);
+    pointer -= 8;
+    copyout(str, pointer, 8);
 
     return newLoc;
 }
