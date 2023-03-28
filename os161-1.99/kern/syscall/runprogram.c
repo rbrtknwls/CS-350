@@ -127,4 +127,5 @@ vaddr_t argcopy_out (vaddr_t &pointer, char* str) {
     copyout(pointer, 8);
 
     return pointer;
+
 }
