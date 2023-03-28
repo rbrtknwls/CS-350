@@ -49,7 +49,7 @@
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
     pointer -= 8;
-    copyout(str, *pointer, 8);
+    copyout(*str, *pointer, 8);
 
     return *pointer;
 }
