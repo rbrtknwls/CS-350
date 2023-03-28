@@ -132,8 +132,7 @@ common_prog(int nargs, char **args)
 	int result;
 
 #if OPT_SYNCHPROBS
-	kprintf("Warning: this probably won't work with a "
-		"synchronization-problems kernel.\n");
+
 #endif
 
 	/* Create a process for the new program to run in. */
