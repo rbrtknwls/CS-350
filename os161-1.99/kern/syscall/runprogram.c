@@ -55,19 +55,16 @@ int
 runprogram(int argc, char *args[])
 {
     char *progname;
-
     char **argv = kmalloc(argc * sizeof(char *));
 
     strcpy(args[0], progname);
-
-    argc = 0;
 
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
 	int result;
 
-	for (int i = 0; i < arc; i++) {
+	for (int i = 0; i < argc; i++) {
         argv[i] = argcopy_out(stackptr, args[i]);
 	}
 

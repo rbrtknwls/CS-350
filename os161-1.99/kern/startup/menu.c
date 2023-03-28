@@ -143,6 +143,7 @@ common_prog(int nargs, char **args)
 
 	result = thread_fork(args[0] /* thread name */,
 			proc /* new process */,
+
 			cmd_progthread /* thread function */,
 			args /* thread arg */, nargs /* thread arg */);
 	if (result) {
