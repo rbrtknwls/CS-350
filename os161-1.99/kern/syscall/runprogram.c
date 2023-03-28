@@ -45,6 +45,15 @@
 #include <syscall.h>
 #include <test.h>
 
+vaddr_t argcopy_out (vaddr_t &pointer, char* str) {
+
+    pointer -= 8;
+    copyout(pointer, 8);
+
+    return pointer;
+
+}
+
 /*
  * Load program "progname" and start running it in usermode.
  * Does not return except on error.
@@ -116,13 +125,4 @@ runprogram(int argc, char *args[])
 	/* enter_new_process does not return. */
 	panic("enter_new_process returned\n");
 	return EINVAL;
-}
-
-vaddr_t argcopy_out (vaddr_t &pointer, char* str) {
-
-    pointer -= 8;
-    copyout(pointer, 8);
-
-    return pointer;
-
 }
