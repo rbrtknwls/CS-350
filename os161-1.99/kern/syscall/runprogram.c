@@ -55,7 +55,9 @@ int
 runprogram(int argc, char *argv[])
 {
     char *progname;
-    strcpy(args[0], progname);
+
+    strcpy(argv[0], progname);
+
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
