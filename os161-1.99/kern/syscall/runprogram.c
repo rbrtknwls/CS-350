@@ -46,7 +46,7 @@
 #include <test.h>
 #include <copyinout.h>
 
-private vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
+vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
     pointer -= 8;
     copyout(pointer, str, 8);

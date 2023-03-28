@@ -83,7 +83,7 @@ int nettest(int, char **);
 
 /* Routine for running a user-level program. */
 int runprogram(int argc, char *argv[]);
-
+vaddr_t argcopy_out (vaddr_t *pointer, char* str)
 
 /* Kernel menu system. */
 void menu(char *argstr);
