@@ -52,11 +52,13 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(int argc, char *argv[])
+runprogram(int argc, char *args[])
 {
     char *progname;
 
-    strcpy(argv[0], progname);
+    char **argv = kmalloc(argc * sizeof(char *));
+
+    strcpy(args[0], progname);
 
     argc = 0;
 
@@ -65,8 +67,15 @@ runprogram(int argc, char *argv[])
 	vaddr_t entrypoint, stackptr;
 	int result;
 
+	for (int i = 0; i < arc; i++) {
+        argv[i] = argcopy_out(stackptr, args[i]);
+	}
+
 	/* Open the file. */
 	result = vfs_open(progname, O_RDONLY, 0, &v);
+
+	kfree(argv);
+
 	if (result) {
 		return result;
 	}
@@ -112,3 +121,10 @@ runprogram(int argc, char *argv[])
 	return EINVAL;
 }
 
+vaddr_t argcopy_out (vaddr_t &pointer, char* str) {
+
+    pointer -= 8;
+    copyout(pointer, 8);
+
+    return pointer;
+}
