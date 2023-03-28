@@ -115,7 +115,7 @@ runprogram(int argc, char *args[])
     char **argv = kmalloc(argc * sizeof(char *));
     for (int i = 0; i < argc; i++) {
 
-        argv[i] = argcopy_out(&stackptr, &args[i]);
+        argv[i] = argcopy_out(&stackptr, args[i]);
     }
 
 
