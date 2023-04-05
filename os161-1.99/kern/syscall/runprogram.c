@@ -125,7 +125,8 @@ runprogram(int argc, char *args[])
 
     for (int i = 0; i < argc; i++) {
        argv[i] = argcopy_out(&stackptr, args[i]);
-       DEBUG(DB_THREADS,"UserSpace arg %d: %s\n",i, argv[i]);
+       DEBUG(DB_THREADS,"UserSpace arg %d: %d\n",i, argv[i]);
+       DEBUG(DB_THREADS,"UserSpace arg %d: %d\n",i, stackptr);
     }
     argv[argc] = (vaddr_t) NULL;
 
