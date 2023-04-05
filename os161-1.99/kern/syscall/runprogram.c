@@ -46,19 +46,16 @@
 #include <test.h>
 #include <copyinout.h>
 
-#include "opt-A3.h"
-
-#ifdef OPT_A3
-vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
-    DEBUG(DB_THREADS,"String %s\n", str);
-    int memSpace = strlen(str) + 1;
-    *pointer -= memSpace;
-    copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
-
-
-    return *pointer;
+userptr_t argcopy_out(vaddr_t *stackptr, const char *s) {
+	int memory = strlen(s) + 1;
+	*stackptr -= memory;
+	int err = copyoutstr(s, (userptr_t)*stackptr, memory, NULL);
+	if (err) {
+		*stackptr += memory;
+		return NULL;
+	}
+	return (userptr_t)*stackptr;
 }
-#endif
 
 /*
  * Load program "progname" and start running it in usermode.
@@ -67,23 +64,15 @@ vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(int argc, char *args[])
+runprogram(int argc, char **argv)
 {
-    DEBUG(DB_THREADS,"=== Starting run program === \n");
-    DEBUG(DB_THREADS,"Num args: %d\n",argc);
-
-    for (int i = 0; i < argc; i++) {
-        DEBUG(DB_THREADS,"Arg %d: %s\n",i, args[i]);
-    }
-
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
 	int result;
 
 	/* Open the file. */
-	result = vfs_open(args[0], O_RDONLY, 0, &v);
-
+	result = vfs_open(argv[0], O_RDONLY, 0, &v);
 	if (result) {
 		return result;
 	}
@@ -120,28 +109,29 @@ runprogram(int argc, char *args[])
 		return result;
 	}
 
+	vaddr_t *args = kmalloc(sizeof(vaddr_t) * (argc + 1));
 
-    int spaceAlc = (argc+1) * sizeof(vaddr_t);
+	for (int i = 0; i < argc; i++) {
+		userptr_t err = argcopy_out(&stackptr, argv[i]);
+		if (err == NULL) {
+			kfree(args);
+			return EFAULT;
+		}
+		args[i] = stackptr;
+	}
+	args[argc] = NULL;
 
-    vaddr_t *argv = kmalloc(spaceAlc);
-
-    for (int i = 0; i < argc; i++) {
-       argv[i] = argcopy_out(&stackptr, args[i]);
-       DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
-    }
-
-    argv[argc] = (vaddr_t) NULL;
-
-    stackptr = (stackptr/4)*4 - spaceAlc;
-    copyout(argv, (userptr_t)stackptr, spaceAlc);
-
+	stackptr = (stackptr / 4) * 4;
+	stackptr -= sizeof(vaddr_t) * (argc + 1);
+	copyout(args, (userptr_t)stackptr, sizeof(vaddr_t) * (argc + 1));
+	kfree(args);
 
 	/* Warp to user mode. */
-	enter_new_process(argc /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
+	enter_new_process(argc, stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
-	kfree(argv);
 	/* enter_new_process does not return. */
 	panic("enter_new_process returned\n");
 	return EINVAL;
 }
+
