@@ -51,7 +51,7 @@
 #ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
     int memSpace = strlen(str) + 1;
-    *pointer -= 8;
+    *pointer -= memSpace;
     copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
 
     return *pointer;
@@ -130,9 +130,8 @@ runprogram(int argc, char *args[])
 
     argv[argc] = (vaddr_t) NULL;
 
-	stackptr = (stackptr / 4) * 4;
-	stackptr -= sizeof(vaddr_t) * (argc + 1);
-	copyout(argv, (userptr_t)stackptr, sizeof(vaddr_t) * (argc + 1));
+    stackptr = (stackptr/4)*4 - spaceAlc;
+    copyout(argv, (userptr_t)stackptr, spaceAlc);
 
 
 	/* Warp to user mode. */
