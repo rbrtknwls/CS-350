@@ -51,14 +51,14 @@
 #ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
-	int memory = strlen(s) + 1;
-	*stackptr -= memory;
-	int err = copyoutstr(s, (userptr_t)*stackptr, memory, NULL);
+	int memory = strlen(str) + 1;
+	*pointer -= memory;
+	int err = copyoutstr(s, (userptr_t)*pointer, memory, NULL);
 	if (err) {
 		*stackptr += memory;
 		return (vaddr_t) NULL;
 	}
-	return *stackptr;
+	return *pointer;
 }
 #endif
 
@@ -139,7 +139,6 @@ runprogram(int argc, char *args[])
 
     copyout(argv, (userptr_t)stackptr, spaceAlc);
 
-    char * = stackptr
 	/* Warp to user mode. */
 	enter_new_process(argc /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
