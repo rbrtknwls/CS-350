@@ -51,14 +51,10 @@
 #ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
-	int memory = strlen(str) + 1;
-	*pointer -= memory;
-	int err = copyoutstr(str, (userptr_t)*pointer, memory, NULL);
-	if (err) {
-		*pointer += memory;
-		return (vaddr_t) NULL;
-	}
-	return *pointer;
+    int memSpace = strlen(str) + 1;
+    *pointer -= memSpace;
+    copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
+    return *pointer;
 }
 #endif
 
@@ -128,7 +124,7 @@ runprogram(int argc, char *args[])
     vaddr_t *argv = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argv[i] = argcopy_out(&stackptr, args[i]);
+       argcopy_out(&stackptr, args[i]);
        argv[i] = stackptr;
        DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
