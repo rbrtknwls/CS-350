@@ -126,7 +126,7 @@ runprogram(int argc, char *args[])
     copyout(argv, (userptr_t)stackptr, spaceAlc);
 
 	/* Warp to user mode. */
-	enter_new_process(argc /*argc*/, stackptr /*userspace addr of argv*/,
+	enter_new_process(argc /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
 	kfree(argv);
