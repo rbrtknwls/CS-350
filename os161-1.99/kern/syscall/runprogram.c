@@ -67,6 +67,12 @@ vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 int
 runprogram(int argc, char *args[])
 {
+    DEBUG(DB_THREADS,"=== Starting run program === \n");
+    DEBUG(DB_THREADS,"Num args: %d\n",argc);
+
+    for (int i = 0; i < argc, i++) {
+        DEBUG(DB_THREADS,"Arg %d: %s\n",i, args[i]);
+    }
 
 	struct addrspace *as;
 	struct vnode *v;
@@ -124,6 +130,8 @@ runprogram(int argc, char *args[])
 
     stackptr = (stackptr/4)*4 - spaceAlc;
     copyout(argv, (userptr_t)stackptr, spaceAlc);
+
+
 
 	/* Warp to user mode. */
 	enter_new_process(argc /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
