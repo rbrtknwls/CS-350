@@ -113,7 +113,7 @@ runprogram(int argc, char *args[])
 	}
 
 
-    int spaceAlc = ((argc+1) * sizeof(char vaddr_t));
+    int spaceAlc = (argc+1) * sizeof(vaddr_t);
 
     vaddr_t *argv = kmalloc(spaceAlc);
 
