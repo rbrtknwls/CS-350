@@ -53,11 +53,8 @@ vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
 
     int memSpace = strlen(str) + 1;
     *pointer -= memSpace;
-    int err = copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
-    if (err) {
-        *pointer += memSpace;
-        return (vaddr_t) NULL;
-    }
+    copyoutstr(str, (userptr_t) *pointer, memSpace, NULL);
+
     return *pointer;
 }
 #endif
@@ -128,8 +125,7 @@ runprogram(int argc, char *args[])
     vaddr_t *argv = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argcopy_out(&stackptr, args[i]);
-       argv[i] = stackptr;
+       argv[i] = argcopy_out(&stackptr, args[i]);
 
        DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
