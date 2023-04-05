@@ -119,7 +119,7 @@ runprogram(int argc, char **argv)
 		}
 		args[i] = stackptr;
 	}
-	args[argc] = NULL;
+	args[argc] = (vaddr_t) NULL;
 
 	stackptr = (stackptr / 4) * 4;
 	stackptr -= sizeof(vaddr_t) * (argc + 1);
@@ -127,7 +127,7 @@ runprogram(int argc, char **argv)
 	kfree(args);
 
 	/* Warp to user mode. */
-	enter_new_process(argc, stackptr /*userspace addr of argv*/,
+	enter_new_process(argc, (userptr_t) stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
 	/* enter_new_process does not return. */
