@@ -86,7 +86,7 @@ int nettest(int, char **);
 /* Routine for running a user-level program. */
 #ifdef OPT_A3
 int runprogram(int argc, char *argv[]);
-vaddr_t argcopy_out (vaddr_t *pointer, char* str);
+vaddr_t argcopy_out (vaddr_t *pointer, const char* str);
 #else
 int runprogram(char *progname);
 #endif

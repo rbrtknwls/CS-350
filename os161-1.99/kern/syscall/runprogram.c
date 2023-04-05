@@ -49,7 +49,7 @@
 #include "opt-A3.h"
 
 #ifdef OPT_A3
-vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
+vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
 
     int memSpace = strlen(str) + 1;
     *pointer -= memSpace;
@@ -124,8 +124,8 @@ runprogram(int argc, char *args[])
     vaddr_t *argv = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argcopy_out(&stackptr, args[i]);
-       argv[i] = stackptr;
+       argv[i] = argcopy_out(&stackptr, args[i]);
+
        DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
 
