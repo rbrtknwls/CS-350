@@ -129,7 +129,7 @@ runprogram(int argc, char *args[])
 
     for (int i = 0; i < argc; i++) {
        argcopy_out(&stackptr, args[i]);
-       argv[i] = stackptr
+       argv[i] = stackptr;
 
        DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
