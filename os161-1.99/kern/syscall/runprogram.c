@@ -53,7 +53,11 @@ vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
 
     int memSpace = strlen(str) + 1;
     *pointer -= memSpace;
-    copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
+    int err = copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
+    if (err) {
+        *pointer += memSpace;
+        return (vaddr_t) NULL;
+    }
     return *pointer;
 }
 #endif
