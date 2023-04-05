@@ -123,7 +123,7 @@ runprogram(int argc, char *args[])
     argv[argc] = NULL;
 
     stackptr = (stackptr/4)*4 - spaceAlc;
-    copyout(argv, (userptr_t)stackptr, sizeof(vaddr_t) * (argc + 1));
+    copyout(argv, (userptr_t)stackptr, spaceAlc);
 
 	/* Warp to user mode. */
 	enter_new_process(argc /*argc*/, stackptr /*userspace addr of argv*/,
