@@ -53,9 +53,9 @@ vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 
 	int memory = strlen(str) + 1;
 	*pointer -= memory;
-	int err = copyoutstr(s, (userptr_t)*pointer, memory, NULL);
+	int err = copyoutstr(str, (userptr_t)*pointer, memory, NULL);
 	if (err) {
-		*stackptr += memory;
+		*pointer += memory;
 		return (vaddr_t) NULL;
 	}
 	return *pointer;
