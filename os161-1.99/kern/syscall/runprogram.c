@@ -120,7 +120,7 @@ runprogram(int argc, char *args[])
     for (int i = 0; i < argc; i++) {
        argv[i] = argcopy_out(&stackptr, args[i]);
     }
-    argv[argc] = NULL;
+    argv[argc] = (vaddr_t) NULL;
 
     stackptr = (stackptr/4)*4 - spaceAlc;
     copyout(argv, (userptr_t)stackptr, spaceAlc);
