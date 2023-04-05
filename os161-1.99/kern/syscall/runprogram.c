@@ -128,7 +128,8 @@ runprogram(int argc, char *args[])
     vaddr_t *argv = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argv[i] = argcopy_out(&stackptr, args[i]);
+       argcopy_out(&stackptr, args[i]);
+       argv[i] = stackptr
 
        DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
