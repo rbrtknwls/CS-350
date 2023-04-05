@@ -50,9 +50,9 @@
 
 #ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
-
-    pointer -= 8;
-    copyout(str, (userptr_t) pointer, 8);
+    int memSpace = strlen(str) + 1;
+    *pointer -= 8;
+    copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
 
     return *pointer;
 }
@@ -67,8 +67,6 @@ vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
 int
 runprogram(int argc, char *args[])
 {
-    char *progname;
-    strcpy(args[0], progname);
 
 	struct addrspace *as;
 	struct vnode *v;
@@ -115,16 +113,21 @@ runprogram(int argc, char *args[])
 		return result;
 	}
 
-    char **argv = kmalloc(argc * sizeof(char *));
+
+    int spaceAlc = (argc+1) * sizeof(char vaddr_t);
+
+    vaddr_t  *argv = kmalloc(spaceAlc);
+
     for (int i = 0; i < argc; i++) {
-
-        //argv[i] = argcopy_out(&stackptr, &args[i]);
+       argv[i] = argcopy_out(&stackptr, &args[i]);
     }
+    argv[argc] = NULL;
 
-
+    stackptr = (stackptr/4)*4 - spaceAlc;
+    copyout(argv, (userptr_t)stackptr, sizeof(vaddr_t) * (argc + 1));
 
 	/* Warp to user mode. */
-	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
+	enter_new_process(argc /*argc*/, stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
 	kfree(argv);
