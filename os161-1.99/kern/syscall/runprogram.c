@@ -74,8 +74,7 @@ runprogram(int argc, char *args[])
 	int result;
 
 	/* Open the file. */
-	result = vfs_open(progname, O_RDONLY, 0, &v);
-
+	result = vfs_open(args[0], O_RDONLY, 0, &v);
 
 	if (result) {
 		return result;
@@ -114,12 +113,12 @@ runprogram(int argc, char *args[])
 	}
 
 
-    int spaceAlc = (argc+1) * sizeof(char vaddr_t);
+    int spaceAlc = ((argc+1) * sizeof(char vaddr_t));
 
-    vaddr_t  *argv = kmalloc(spaceAlc);
+    vaddr_t *argv = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argv[i] = argcopy_out(&stackptr, &args[i]);
+       argv[i] = argcopy_out(&stackptr, args[i]);
     }
     argv[argc] = NULL;
 
