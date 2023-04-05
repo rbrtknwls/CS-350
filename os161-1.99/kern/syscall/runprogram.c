@@ -70,7 +70,7 @@ runprogram(int argc, char *args[])
     DEBUG(DB_THREADS,"=== Starting run program === \n");
     DEBUG(DB_THREADS,"Num args: %d\n",argc);
 
-    for (int i = 0; i < argc, i++) {
+    for (int i = 0; i < argc; i++) {
         DEBUG(DB_THREADS,"Arg %d: %s\n",i, args[i]);
     }
 
