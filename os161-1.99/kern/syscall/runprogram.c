@@ -50,7 +50,7 @@
 
 #ifdef OPT_A3
 vaddr_t argcopy_out (vaddr_t *pointer, char* str) {
-    DEBUG(DB_THREADS,"String %s\n",i, str);
+    DEBUG(DB_THREADS,"String %s\n", str);
     int memSpace = strlen(str) + 1;
     *pointer -= memSpace;
     copyoutstr(str, (userptr_t) pointer, memSpace, NULL);
