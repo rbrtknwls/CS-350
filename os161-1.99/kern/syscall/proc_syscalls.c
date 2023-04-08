@@ -7,6 +7,7 @@
 #include <current.h>
 #include <proc.h>
 #include <thread.h>
+#include <vfs.h>
 #include <addrspace.h>
 #include <copyinout.h>
 #include <mips/trapframe.h>
