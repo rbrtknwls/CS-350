@@ -78,7 +78,7 @@ void args_free(char **args) {
 int argcopy_in(char **args, char **argv) {
     int currArg = 0;
     while(argv[currArg] != NULL) {
-        copyinstr((userptr_t *) argv[i], args[i], strlen(argv[i]) + 1, NULL);
+        copyinstr((userptr_t *) argv[currArg], args[currArg], strlen(argv[currArg]) + 1, NULL);
         currArg++;
     }
     return currArg;
