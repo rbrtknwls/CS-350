@@ -230,7 +230,7 @@ int sys_exec(char *progname, char **argv) {
 	(void) argv;
 
 
-	char *kernprogname = kmalloc((strlen(progname) + 1) * sizeof(char*))
+	char *kernprogname = kmalloc((strlen(progname) + 1) * sizeof(char*));
 
 	copyin((const_userptr_t) progname, (void *) kernprogname, (strlen(progname) + 1) * sizeof(char*));
     DEBUG(DB_THREADS,"Kernal progname is: %s\n", kernprogname);
