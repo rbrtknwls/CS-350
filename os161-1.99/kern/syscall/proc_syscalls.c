@@ -229,7 +229,6 @@ int sys_exec(char *progname, char **argv) {
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
 	int result;
-	(void) argv;
 
 	result = vfs_open(progname, O_RDONLY, 0, &v);
 
@@ -260,12 +259,6 @@ int sys_exec(char *progname, char **argv) {
 	}
 
 
-    int argc = 0;
-    for (int i = 0; argv[i] != NULL; i++) {
-        argc++;
-    }
-
-    DEBUG(DB_THREADS,"We have #%d of args. \n", argc);
 
 
 
