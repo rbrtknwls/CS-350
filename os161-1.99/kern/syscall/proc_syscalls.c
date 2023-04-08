@@ -223,17 +223,19 @@ sys_waitpid(pid_t pid,
 int sys_exec(char *progname, char **argv) {
     DEBUG(DB_THREADS,"=== Starting sys_exec program === \n");
 
-	struct addrspace *as;
+	/*struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
-	int result;
+	int result;*/
+	(void) argv;
 
-    /*
+
 	char *kernprogname = kmalloc((strlen(progname) + 1) * sizeof(char*))
 
 	copyin((const_userptr_t) progname, (void *) kernprogname, (strlen(progname) + 1) * sizeof(char*));
     DEBUG(DB_THREADS,"Kernal progname is: %s\n", kernprogname);
 
+    /*
 	result = vfs_open(args[0], O_RDONLY, 0, &v);
 
 	if (result) {
