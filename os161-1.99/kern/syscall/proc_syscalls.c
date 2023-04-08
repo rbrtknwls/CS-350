@@ -234,9 +234,9 @@ int sys_exec(char *progname, char **argv) {
 
 	copyin((const_userptr_t) progname, (void *) kernprogname, (strlen(progname) + 1) * sizeof(char*));
     DEBUG(DB_THREADS,"Kernal progname is: %s\n", kernprogname);
-
+    DEBUG(DB_THREADS,"progname is: %s\n", progname);
     /*
-	result = vfs_open(args[0], O_RDONLY, 0, &v);
+	result = vfs_open(kernprogname, O_RDONLY, 0, &v);
 
 	if (result) {
 		return result;
