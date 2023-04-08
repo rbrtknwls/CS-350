@@ -58,7 +58,8 @@ vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
     return *pointer;
 }
 
-char **args_alloc() {
+char **args_alloc(char *x) {
+    (void ) x
     char** newArgs = kmalloc(17 * sizeof(char*));
     newArgs[16] = NULL;
     for (int i = 0; i < 16; i++) {

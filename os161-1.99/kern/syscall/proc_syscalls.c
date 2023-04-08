@@ -231,7 +231,7 @@ int sys_exec(char *progname, char **argv) {
 	vaddr_t entrypoint, stackptr;
 	int result;
 
-	char **args = args_alloc();
+	char **args = args_alloc("a");
     int argc = argcopy_in(args, argv);
 
 	result = vfs_open(progname, O_RDONLY, 0, &v);

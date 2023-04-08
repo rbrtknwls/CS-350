@@ -89,7 +89,7 @@ int runprogram(int argc, char *argv[]);
 vaddr_t argcopy_out (vaddr_t *pointer, const char* str);
 void args_free(char **args);
 int argcopy_in(char **args, char **argv);
-char **args_alloc();
+char **args_alloc(char *x);
 #else
 int runprogram(char *progname);
 #endif
