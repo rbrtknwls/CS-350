@@ -259,6 +259,12 @@ int sys_exec(char *progname, char **argv) {
 	}
 
 
+    int argc = 0;
+    for (int i = 0; argv[i] != NULL; i++) {
+        argc++;
+    }
+
+    DEBUG(DB_THREADS,"We have #%d of args. \n", argc);
 
 
 
