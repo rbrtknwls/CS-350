@@ -30,7 +30,7 @@
 #ifndef _TEST_H_
 #define _TEST_H_
 
-#include "opt-A3.h"
+#include "opt-A2.h"
 
 /*
  * Declarations for test code and other miscellaneous high-level
@@ -84,7 +84,7 @@ int mallocstress(int, char **);
 int nettest(int, char **);
 
 /* Routine for running a user-level program. */
-#ifdef OPT_A3
+#ifdef OPT_A2
 int runprogram(int argc, char *argv[]);
 vaddr_t argcopy_out (vaddr_t *pointer, const char* str);
 #else

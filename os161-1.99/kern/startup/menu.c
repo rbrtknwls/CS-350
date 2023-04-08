@@ -45,7 +45,7 @@
 #include "opt-synchprobs.h"
 #include "opt-sfs.h"
 #include "opt-net.h"
-#include "opt-A3.h"
+#include "opt-A2.h"
 /*
  * In-kernel menu and command dispatcher.
  */
@@ -102,7 +102,7 @@ cmd_progthread(void *ptr, unsigned long nargs)
 
 	strcpy(progname, args[0]);
 
-	#ifdef OPT_A3
+	#ifdef OPT_A2
     result = runprogram(nargs, args);
     #else
     result = runprogram(progname);

@@ -13,7 +13,7 @@
 #include <clock.h>
 
 #include "opt-A1.h"
-#include "opt-A3.h"
+#include "opt-A2.h"
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -219,7 +219,7 @@ sys_waitpid(pid_t pid,
   return(0);
 }
 
-#ifdef OPT_A3
+#ifdef OPT_A2
 int sys_exec(char *progname, char **argv) {
     DEBUG(DB_THREADS,"=== Starting sys_exec program === \n");
 

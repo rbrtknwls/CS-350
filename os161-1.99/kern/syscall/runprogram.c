@@ -46,9 +46,9 @@
 #include <test.h>
 #include <copyinout.h>
 
-#include "opt-A3.h"
+#include "opt-A2.h"
 
-#ifdef OPT_A3
+#ifdef OPT_A2
 vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
 
     int memSpace = strlen(str) + 1;
