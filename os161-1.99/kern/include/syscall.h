@@ -73,7 +73,7 @@ void enter_forked_process(struct trapframe *tf);
 #endif
 
 #ifdef OPT_A3
-sys_exec(char *progname, char **argv);
+int sys_exec(char *progname, char **argv);
 #endif
 
 #endif /* _SYSCALL_H_ */
