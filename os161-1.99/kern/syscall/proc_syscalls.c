@@ -223,27 +223,17 @@ sys_waitpid(pid_t pid,
 int sys_exec(char *progname, char **argv) {
     DEBUG(DB_THREADS,"=== Starting sys_exec program === \n");
 
-	/*struct addrspace *as;
+	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
-	int result;*/
+	int result;
 	(void) argv;
 
-
-	char *kernprogname = kmalloc((strlen(progname) + 1) * sizeof(char*));
-
-	copyin((const_userptr_t) progname, (void *) kernprogname, (strlen(progname) + 1) * sizeof(char*));
-    DEBUG(DB_THREADS,"Kernal progname is: %s\n", kernprogname);
-    DEBUG(DB_THREADS,"progname is: %s\n", progname);
-    /*
-	result = vfs_open(kernprogname, O_RDONLY, 0, &v);
+	result = vfs_open(progname, O_RDONLY, 0, &v);
 
 	if (result) {
 		return result;
 	}
-
-
-	KASSERT(curproc_getas() == NULL);
 
 	as = as_create();
 	if (as ==NULL) {
@@ -251,7 +241,7 @@ int sys_exec(char *progname, char **argv) {
 		return ENOMEM;
 	}
 
-	curproc_setas(as);
+	struct addrspace *oldas = curproc_setas(as);
 	as_activate();
 
 	result = load_elf(v, &entrypoint);
@@ -268,6 +258,16 @@ int sys_exec(char *progname, char **argv) {
 	}
 
 
+    argc = 0;
+    for (int i = 0; argv[i] != NULL; i++) {
+        argc++;
+    }
+
+    DEBUG(DB_THREADS,"We have #$d of args. \n", argc);
+
+
+
+    /*
     int spaceAlc = (argc+1) * sizeof(vaddr_t);
 
     vaddr_t *argv = kmalloc(spaceAlc);
@@ -283,6 +283,7 @@ int sys_exec(char *progname, char **argv) {
 
     copyout(argv, (userptr_t)stackptr, spaceAlc);
 
+    as_destroy(oldas)
 
 	enter_new_process(argc , (userptr_t) stackptr,
 			  stackptr, entrypoint);
