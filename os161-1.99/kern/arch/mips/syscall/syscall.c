@@ -141,8 +141,8 @@ syscall(struct trapframe *tf)
 
 #ifdef OPT_A3
     case SYS_execv:
-      err = sys_exec((char *) tf.tf_a0,
-                     (char **) tf.tf_a1);
+      err = sys_exec((char *) tf->tf_a0,
+                     (char **) tf->tf_a1);
       break;
 #endif
 	default:
