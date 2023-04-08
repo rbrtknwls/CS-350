@@ -267,19 +267,19 @@ int sys_exec(char *progname, char **argv) {
 
     int spaceAlc = (argc+1) * sizeof(vaddr_t);
 
-    vaddr_t *argv = kmalloc(spaceAlc);
+    vaddr_t *argArray = kmalloc(spaceAlc);
 
     for (int i = 0; i < argc; i++) {
-       argv[i] = argcopy_out(&stackptr, args[i]);
+       argArray[i] = argcopy_out(&stackptr, args[i]);
 
     }
 
-    argv[argc] = (vaddr_t) NULL;
+    argArray[argc] = (vaddr_t) NULL;
     stackptr = (stackptr/4)*4 - spaceAlc;
-    copyout(argv, (userptr_t)stackptr, spaceAlc);
+    copyout(argArray, (userptr_t)stackptr, spaceAlc);
     as_destroy(oldas);
     args_free(args);
-    kfree(argv);
+    kfree(argArray);
 
 	enter_new_process(argc , (userptr_t) stackptr,
 			  stackptr, entrypoint);
