@@ -265,8 +265,6 @@ int sys_exec(char *progname, char **argv) {
     DEBUG(DB_THREADS,"We have %d of args. \n", argc);
 
 
-
-    /*
     int spaceAlc = (argc+1) * sizeof(vaddr_t);
 
     vaddr_t *argv = kmalloc(spaceAlc);
@@ -277,20 +275,17 @@ int sys_exec(char *progname, char **argv) {
     }
 
     argv[argc] = (vaddr_t) NULL;
-
     stackptr = (stackptr/4)*4 - spaceAlc;
-
     copyout(argv, (userptr_t)stackptr, spaceAlc);
-
-    as_destroy(oldas)
+    as_destroy(oldas);
+    args_free(args);
+    kfree(argv);
 
 	enter_new_process(argc , (userptr_t) stackptr,
 			  stackptr, entrypoint);
 
-	kfree(argv);
 	panic("enter_new_process returned\n");
 	*/
-	as_destroy(oldas);
 	return EINVAL;
 
 }
