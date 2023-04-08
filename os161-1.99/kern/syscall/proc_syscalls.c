@@ -13,6 +13,7 @@
 #include <clock.h>
 
 #include "opt-A1.h"
+#include "opt-A3.h"
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -217,4 +218,77 @@ sys_waitpid(pid_t pid,
   *retval = pid;
   return(0);
 }
+
+#ifdef OPT_A3
+int sys_exec(char *progname, char **argv) {
+    DEBUG(DB_THREADS,"=== Starting sys_exec program === \n");
+
+	struct addrspace *as;
+	struct vnode *v;
+	vaddr_t entrypoint, stackptr;
+	int result;
+
+    /*
+	char *kernprogname = kmalloc((strlen(progname) + 1) * sizeof(char*))
+
+	copyin((const_userptr_t) progname, (void *) kernprogname, (strlen(progname) + 1) * sizeof(char*));
+    DEBUG(DB_THREADS,"Kernal progname is: %s\n", kernprogname);
+
+	result = vfs_open(args[0], O_RDONLY, 0, &v);
+
+	if (result) {
+		return result;
+	}
+
+
+	KASSERT(curproc_getas() == NULL);
+
+	as = as_create();
+	if (as ==NULL) {
+		vfs_close(v);
+		return ENOMEM;
+	}
+
+	curproc_setas(as);
+	as_activate();
+
+	result = load_elf(v, &entrypoint);
+	if (result) {
+		vfs_close(v);
+		return result;
+	}
+
+	vfs_close(v);
+
+	result = as_define_stack(as, &stackptr);
+	if (result) {
+		return result;
+	}
+
+
+    int spaceAlc = (argc+1) * sizeof(vaddr_t);
+
+    vaddr_t *argv = kmalloc(spaceAlc);
+
+    for (int i = 0; i < argc; i++) {
+       argv[i] = argcopy_out(&stackptr, args[i]);
+
+    }
+
+    argv[argc] = (vaddr_t) NULL;
+
+    stackptr = (stackptr/4)*4 - spaceAlc;
+
+    copyout(argv, (userptr_t)stackptr, spaceAlc);
+
+
+	enter_new_process(argc , (userptr_t) stackptr,
+			  stackptr, entrypoint);
+
+	kfree(argv);
+	panic("enter_new_process returned\n");
+	*/
+	return EINVAL;
+}
+#endif
 

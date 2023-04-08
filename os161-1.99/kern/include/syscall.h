@@ -31,6 +31,7 @@
 #define _SYSCALL_H_
 
 #include "opt-A1.h"
+#include "opt-A3.h"
 
 struct trapframe; /* from <machine/trapframe.h> */
 
@@ -69,6 +70,10 @@ void enter_forked_process(void *tf, unsigned long value2);
 int sys_fork(pid_t *retval, struct trapframe *tf);
 #else
 void enter_forked_process(struct trapframe *tf);
+#endif
+
+#ifdef OPT_A3
+sys_exec(char *progname, char **argv);
 #endif
 
 #endif /* _SYSCALL_H_ */

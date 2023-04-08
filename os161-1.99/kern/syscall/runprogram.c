@@ -127,7 +127,6 @@ runprogram(int argc, char *args[])
     for (int i = 0; i < argc; i++) {
        argv[i] = argcopy_out(&stackptr, args[i]);
 
-       DEBUG(DB_THREADS,"(%d, %d), ",i, argv[i]);
     }
 
     argv[argc] = (vaddr_t) NULL;
