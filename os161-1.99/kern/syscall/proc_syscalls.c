@@ -285,7 +285,6 @@ int sys_exec(char *progname, char **argv) {
 			  stackptr, entrypoint);
 
 	panic("enter_new_process returned\n");
-	*/
 	return EINVAL;
 
 }
