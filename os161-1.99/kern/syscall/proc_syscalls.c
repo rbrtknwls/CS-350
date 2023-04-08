@@ -293,7 +293,9 @@ int sys_exec(char *progname, char **argv) {
 	kfree(argv);
 	panic("enter_new_process returned\n");
 	*/
+	kfree(argv);
 	return EINVAL;
+
 }
 #endif
 
