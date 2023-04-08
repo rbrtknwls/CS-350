@@ -57,6 +57,32 @@ vaddr_t argcopy_out (vaddr_t *pointer, const char* str) {
 
     return *pointer;
 }
+
+char **args_alloc() {
+    char** newArgs = kmalloc(17 * sizeof(char*));
+    newArgs[16] = NULL;
+    for (int i = 0; i < 16; i++) {
+        newArgs[i] = kmalloc(128 * sizeof(char));
+    }
+    return newArgs;
+}
+
+void args_free(char **args) {
+    for (int i = 0; i < 17; i++) {
+        kfree(args[i]);
+    }
+    kfree(args);
+    args = NULL;
+}
+
+int argcopy_in(char **args, char **argv) {
+    int currArg = 0;
+    while(argv[currArg] != NULL) {
+        copyinstr((userptr_t *) argv[i], args[i], strlen(argv[i]) + 1, NULL);
+        currArg++;
+    }
+    return currArg;
+}
 #endif
 
 /*

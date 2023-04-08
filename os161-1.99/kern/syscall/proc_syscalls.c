@@ -13,6 +13,7 @@
 #include <copyinout.h>
 #include <mips/trapframe.h>
 #include <clock.h>
+#include <test.h>
 
 #include "opt-A1.h"
 #include "opt-A2.h"
@@ -230,6 +231,9 @@ int sys_exec(char *progname, char **argv) {
 	vaddr_t entrypoint, stackptr;
 	int result;
 
+	char **args = args_alloc();
+    int argc = argcopy_in(args, argv);
+
 	result = vfs_open(progname, O_RDONLY, 0, &v);
 
 	if (result) {
@@ -258,13 +262,7 @@ int sys_exec(char *progname, char **argv) {
 		return result;
 	}
 
-
-    int argc = 0;
-    for (int i = 0; argv[i] != NULL; i++) {
-        argc++;
-    }
-
-    DEBUG(DB_THREADS,"We have #%d of args. \n", argc);
+    DEBUG(DB_THREADS,"We have %d of args. \n", argc);
 
 
 
