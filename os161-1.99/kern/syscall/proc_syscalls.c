@@ -2,6 +2,7 @@
 #include <kern/errno.h>
 #include <kern/unistd.h>
 #include <kern/wait.h>
+#include <kern/fcntl.h>
 #include <lib.h>
 #include <syscall.h>
 #include <current.h>
@@ -259,12 +260,12 @@ int sys_exec(char *progname, char **argv) {
 	}
 
 
-    argc = 0;
+    int argc = 0;
     for (int i = 0; argv[i] != NULL; i++) {
         argc++;
     }
 
-    DEBUG(DB_THREADS,"We have #$d of args. \n", argc);
+    DEBUG(DB_THREADS,"We have #%d of args. \n", argc);
 
 
 
