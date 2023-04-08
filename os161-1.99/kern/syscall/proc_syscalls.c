@@ -293,7 +293,7 @@ int sys_exec(char *progname, char **argv) {
 	kfree(argv);
 	panic("enter_new_process returned\n");
 	*/
-	as_destroy(oldas)
+	as_destroy(oldas);
 	return EINVAL;
 
 }
