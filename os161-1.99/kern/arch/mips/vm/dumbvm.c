@@ -46,128 +46,41 @@
 /* under dumbvm, always have 48k of user stack */
 
 #define DUMBVM_STACKPAGES    12
-#define ALLOC_POISON  0x22332233
-#define AVAILABLE 0x33223322
+/*#define ALLOC_POISON  0x22332233
+#define AVAILABLE 0x33223322*/
 
-int *allocator;
-bool physmap_ready = false;
-int pageLoc, arrLength;
-paddr_t ehi, elo;
+#define ALLOC_POISON 0x12345678
+#define AVAILABLE 0x87654321
 
 /*
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
-void putppages(paddr_t paddr) {
-	if (!physmap_ready) {
-		return;
-	}
-	else {
-		int nungus = (paddr - elo) / PAGE_SIZE;
-		spinlock_acquire(&stealmem_lock);
-		int npages = allocator[nungus];
-		for (int i = 0; i < npages; i++) {
-			allocator[nungus + i] = AVAILABLE;
-		}
-		spinlock_release(&stealmem_lock);
-	}
-}
-
-/*
-void putppages(paddr_t paddr) {
-    if (physmap_ready) {
-
-        spinlock_acquire(&stealmem_lock);
-
-        int val = (paddr - elo) / PAGE_SIZE;
-        for (int i = 0; i < allocator[val]; i++) {
-            allocator[val + i] = AVAILABLE;
-        }
-        spinlock_release(&stealmem_lock);
-    }
-}*/
+int *physmap;
+bool physmap_ready = false;
+paddr_t ehi, elo;
+int page_num;
 
 void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
-	allocator = (int *) PADDR_TO_KVADDR(elo);
-	pageLoc = (ehi - elo) / PAGE_SIZE;
-	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
+	physmap = PADDR_TO_KVADDR(elo);
+	page_num = (ehi - elo) / PAGE_SIZE;
+	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
 
-	for (int i = 0; i < pageLoc; i++) {
+	for (int i = 0; i < page_num; i++) {
 		if (i < array_size) {
-			allocator[i] = ALLOC_POISON;
+			physmap[i] = ALLOC_POISON;
 		}
 		else {
-			allocator[i] = AVAILABLE;
+			physmap[i] = AVAILABLE;
 		}
 	}
 
 	physmap_ready = true;
 }
-
-/*
-void
-vm_bootstrap(void)
-{
-	ram_getsize(&elo, &ehi);
-	allocator = (int *) PADDR_TO_KVADDR(elo);
-	pageLoc = (ehi - elo) / PAGE_SIZE;
-	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
-
-	for (int i = 0; i < pageLoc; i++) {
-		if (i < array_size) {
-			allocator[i] = ALLOC_POISON;
-		}
-		else {
-			allocator[i] = AVAILABLE;
-		}
-	}
-
-	physmap_ready = true;
-}*/
-
-
-/*static
-paddr_t
-getppages(unsigned long npages)
-{
-	paddr_t addr;
-	spinlock_acquire(&stealmem_lock);
-    if (!physmap_ready){
-	    addr = ram_stealmem(npages);
-	} else {
-
-	    int startingIdx = 0;
-	    bool foundValue = false;
-
-	    for (int i = 0; i < pageLoc; i++) {
-
-            if (allocator[i] == AVAILABLE) {
-                if (foundValue) {
-                    for (unsigned int x = 0; x < npages; x++) {
-                        allocator[startingIdx + x] = ALLOC_POISON;
-                    }
-                    allocator[startingIdx] = npages;
-
-                    addr = elo + (startingIdx * PAGE_SIZE);
-                } else {
-                    startingIdx = i;
-                    foundValue = true;
-                }
-            } else {
-                foundValue = false;
-            }
-
-
-	    }
-
-	}
-	spinlock_release(&stealmem_lock);
-	return addr;
-}*/
 
 static
 paddr_t
@@ -175,9 +88,6 @@ getppages(unsigned long npages)
 {
 	paddr_t addr;
 	spinlock_acquire(&stealmem_lock);
-
-	addr = ram_stealmem(npages);
-	/*
 	if (!physmap_ready) {
 		addr = ram_stealmem(npages);
 	}
@@ -185,20 +95,22 @@ getppages(unsigned long npages)
 		bool record = false;
 		int start = 0;
 
-		for (int i = 0; i < pageLoc; i++) {
+		for (int i = 0; i < page_num; i++) {
 
-			if (allocator[i] == AVAILABLE) {
+			if (physmap[i] == AVAILABLE) {
 
 				if (!record) {
 					start = i;
 					record = true;
 				}
-				else if (((unsigned) (i - start)) == npages) {
+				else if (i - start == npages) {
 
-					for (unsigned int j = 0; j < npages; j++) {
-						allocator[start + j] = ALLOC_POISON;
+					for (int j = 0; j < npages; j++) {
+						physmap[start + j] = ALLOC_POISON;
 					}
-					allocator[start] = npages;
+					physmap[start] = npages;
+
+					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
 
 					addr = elo + (start * PAGE_SIZE);
 					spinlock_release(&stealmem_lock);
@@ -212,10 +124,27 @@ getppages(unsigned long npages)
 
 		}
 		spinlock_release(&stealmem_lock);
-		return (paddr_t) NULL;
-	}*/
+		return NULL;
+	}
 	spinlock_release(&stealmem_lock);
 	return addr;
+}
+
+
+
+void putppages(paddr_t paddr) {
+	if (!physmap_ready) {
+		return;
+	}
+	else {
+		int nungus = (paddr - elo) / PAGE_SIZE;
+		spinlock_acquire(&stealmem_lock);
+		int npages = physmap[nungus];
+		for (int i = 0; i < npages; i++) {
+			physmap[nungus + i] = AVAILABLE;
+		}
+		spinlock_release(&stealmem_lock);
+	}
 }
 
 /* Allocate/free some kernel-space virtual pages */
@@ -223,10 +152,8 @@ vaddr_t
 alloc_kpages(int npages)
 {
 	paddr_t pa;
-	pa = getppages(npages);
-	if (pa==0) {
-		return 0;
-	}
+	getppages(npages);
+
 	return PADDR_TO_KVADDR(pa);
 }
 
