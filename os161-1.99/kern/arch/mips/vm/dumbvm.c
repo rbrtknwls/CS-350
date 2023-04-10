@@ -154,7 +154,7 @@ getppages(unsigned long npages)
 					start = i;
 					record = true;
 				}
-				else if (i - start == npages) {
+				else if (((unsigned) (i - start)) == npages) {
 
 					for (unsigned int j = 0; j < npages; j++) {
 						allocator[start + j] = ALLOC_POISON;
