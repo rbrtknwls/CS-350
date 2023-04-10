@@ -64,6 +64,7 @@ void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
+
 	allocator = (unsigned int*) PADDR_TO_KVADDR(elo);
 	pageLoc = (ehi - elo) / PAGE_SIZE;
 	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
@@ -71,8 +72,7 @@ vm_bootstrap(void)
 	for (int i = 0; i < pageLoc; i++) {
 		if (i < array_size) {
 			allocator[i] = ALLOC_POISON;
-		}
-		else {
+		} else {
 			allocator[i] = AVAILABLE;
 		}
 	}
@@ -109,8 +109,6 @@ getppages(unsigned long npages)
 					allocator[start] = npages;
 
 					addr = elo + (start * PAGE_SIZE);
-					spinlock_release(&stealmem_lock);
-					return addr;
 				}
 
 			}
@@ -119,9 +117,8 @@ getppages(unsigned long npages)
 			}
 
 		}
-		spinlock_release(&stealmem_lock);
-		return (paddr_t) NULL;
 	}
+	
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
