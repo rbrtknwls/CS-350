@@ -55,25 +55,25 @@
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
-unsigned int *physmap;
-bool physmap_ready = false;
+unsigned int *allocator;
 paddr_t ehi, elo;
-int page_num;
+bool physmap_ready = false;
+int pageLoc;
 
 void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
-	physmap = (unsigned int*) PADDR_TO_KVADDR(elo);
-	page_num = (ehi - elo) / PAGE_SIZE;
-	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
+	allocator = (unsigned int*) PADDR_TO_KVADDR(elo);
+	pageLoc = (ehi - elo) / PAGE_SIZE;
+	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
 
-	for (int i = 0; i < page_num; i++) {
+	for (int i = 0; i < pageLoc; i++) {
 		if (i < array_size) {
-			physmap[i] = ALLOC_POISON;
+			allocator[i] = ALLOC_POISON;
 		}
 		else {
-			physmap[i] = AVAILABLE;
+			allocator[i] = AVAILABLE;
 		}
 	}
 
@@ -95,7 +95,7 @@ getppages(unsigned long npages)
 
 		for (int i = 0; i < page_num; i++) {
 
-			if (physmap[i] == AVAILABLE) {
+			if (allocator[i] == AVAILABLE) {
 
 				if (!record) {
 					start = i;
@@ -104,9 +104,9 @@ getppages(unsigned long npages)
 				else if ((unsigned) i - start == npages) {
 
 					for (unsigned int j = 0; j < npages; j++) {
-						physmap[start + j] = ALLOC_POISON;
+						allocator[start + j] = ALLOC_POISON;
 					}
-					physmap[start] = npages;
+					allocator[start] = npages;
 
 					addr = elo + (start * PAGE_SIZE);
 					spinlock_release(&stealmem_lock);
@@ -142,9 +142,10 @@ void putppages(paddr_t paddr) {
 	if (physmap_ready) {
 		spinlock_acquire(&stealmem_lock);
 		int idx = (paddr - elo) / PAGE_SIZE;
-		int numPages = physmap[idx];
+		int numPages = allocator[idx];
+
 		for (int i = 0; i < numPages; i++) {
-			physmap[idx + i] = AVAILABLE;
+			allocator[idx + i] = AVAILABLE;
 		}
 		spinlock_release(&stealmem_lock);
 	}
