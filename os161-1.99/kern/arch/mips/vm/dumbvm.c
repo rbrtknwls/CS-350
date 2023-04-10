@@ -442,9 +442,11 @@ as_complete_load(struct addrspace *as)
 {
 	int spl = splhigh();
 	as->as_loaded = true;
+
 	for (int i=0; i<NUM_TLB; i++) {
 		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
 	}
+
 	splx(spl);
 	return 0;
 }
