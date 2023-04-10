@@ -111,7 +111,7 @@ getppages(unsigned long npages)
 
             if (allocator[i] == AVAILABLE) {
                 if (foundValue) {
-                    for (int x = 0; x < npages; x++) {
+                    for (unsigned int x = 0; x < npages; x++) {
                         allocator[startingIdx + x] = ALLOC_POISON;
                     }
                     allocator[startingIdx] = npages;
