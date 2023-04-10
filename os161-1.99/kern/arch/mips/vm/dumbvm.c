@@ -36,7 +36,6 @@
 #include <current.h>
 #include <mips/tlb.h>
 #include <addrspace.h>
-#include <syscall.h>
 #include <vm.h>
 
 /*
@@ -46,37 +45,16 @@
 
 /* under dumbvm, always have 48k of user stack */
 #define DUMBVM_STACKPAGES    12
-#define ALLOC_POISON 0x12345678
-#define AVAILABLE 0x87654321
 
 /*
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
-int *physmap;
-bool physmap_ready = false;
-paddr_t ehi, elo;
-int page_num;
-
 void
 vm_bootstrap(void)
 {
-	ram_getsize(&elo, &ehi);
-	physmap = PADDR_TO_KVADDR(elo);
-	page_num = (ehi - elo) / PAGE_SIZE;
-	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
-
-	for (int i = 0; i < page_num; i++) {
-		if (i < array_size) {
-			physmap[i] = ALLOC_POISON;
-		}
-		else {
-			physmap[i] = AVAILABLE;
-		}
-	}
-
-	physmap_ready = true;
+	/* Do nothing. */
 }
 
 static
@@ -84,45 +62,11 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
+
 	spinlock_acquire(&stealmem_lock);
-	if (!physmap_ready) {
-		addr = ram_stealmem(npages);
-	}
-	else {
-		bool record = false;
-		int start = 0;
 
-		for (int i = 0; i < page_num; i++) {
+	addr = ram_stealmem(npages);
 
-			if (physmap[i] == AVAILABLE) {
-
-				if (!record) {
-					start = i;
-					record = true;
-				}
-				else if (i - start == npages) {
-
-					for (int j = 0; j < npages; j++) {
-						physmap[start + j] = ALLOC_POISON;
-					}
-					physmap[start] = npages;
-
-					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
-
-					addr = elo + (start * PAGE_SIZE);
-					spinlock_release(&stealmem_lock);
-					return addr;
-				}
-
-			}
-			else {
-				record = false;
-			}
-
-		}
-		spinlock_release(&stealmem_lock);
-		return NULL;
-	}
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
@@ -139,25 +83,12 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
-void putppages(paddr_t paddr) {
-	if (!physmap_ready) {
-		return;
-	}
-	else {
-		int nungus = (paddr - elo) / PAGE_SIZE;
-		spinlock_acquire(&stealmem_lock);
-		int npages = physmap[nungus];
-		for (int i = 0; i < npages; i++) {
-			physmap[nungus + i] = AVAILABLE;
-		}
-		spinlock_release(&stealmem_lock);
-	}
-}
-
 void
 free_kpages(vaddr_t addr)
 {
-	putppages(KVADDR_TO_PADDR(addr));
+	/* nothing - leak the memory. */
+
+	(void)addr;
 }
 
 void
@@ -327,9 +258,6 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
-	putppages(as->as_pbase2);
-	putppages(as->as_stackpbase);
-	putppages(as->as_pbase1);
 	kfree(as);
 }
 
@@ -443,9 +371,11 @@ as_complete_load(struct addrspace *as)
 {
 	int spl = splhigh();
 	as->as_loaded = true;
+
 	for (int i=0; i<NUM_TLB; i++) {
 		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
 	}
+
 	splx(spl);
 	return 0;
 }
