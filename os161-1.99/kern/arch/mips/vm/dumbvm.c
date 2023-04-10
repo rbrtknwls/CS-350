@@ -366,7 +366,7 @@ as_complete_load(struct addrspace *as)
     }
 
     splx(spl);*/
-    (void) as
+    (void) as;
 
 	return 0;
 }
