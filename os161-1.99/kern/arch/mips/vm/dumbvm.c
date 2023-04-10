@@ -93,7 +93,7 @@ getppages(unsigned long npages)
 		bool record = false;
 		int start = 0;
 
-		for (int i = 0; i < page_num; i++) {
+		for (int i = 0; i < pageLoc; i++) {
 
 			if (allocator[i] == AVAILABLE) {
 
