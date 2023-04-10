@@ -146,9 +146,9 @@ getppages(unsigned long npages)
 		bool record = false;
 		int start = 0;
 
-		for (int i = 0; i < page_num; i++) {
+		for (int i = 0; i < pageLoc; i++) {
 
-			if (physmap[i] == AVAILABLE) {
+			if (allocator[i] == AVAILABLE) {
 
 				if (!record) {
 					start = i;
@@ -157,11 +157,11 @@ getppages(unsigned long npages)
 				else if (i - start == npages) {
 
 					for (int j = 0; j < npages; j++) {
-						physmap[start + j] = ALLOC_POISON;
+						allocator[start + j] = ALLOC_POISON;
 					}
-					physmap[start] = npages;
+					allocator[start] = npages;
 
-					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
+					int array_size = ((pageLoc * sizeof(int)) / PAGE_SIZE) + 1;
 
 					addr = elo + (start * PAGE_SIZE);
 					spinlock_release(&stealmem_lock);
