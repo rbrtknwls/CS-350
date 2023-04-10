@@ -113,6 +113,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	uint32_t ehi, elo;
 	struct addrspace *as;
 	int spl;
+	bool dirty;
 
 	faultaddress &= PAGE_FRAME;
 
@@ -170,6 +171,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
+        if (as->as_loaded) {
+            dirty = true;
+        }
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
@@ -194,6 +198,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
+
+        if (dirty) {
+            // Bitwise And / Not
+            elo &= ~TLBLO_DIRTY;
+        }
+
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
@@ -202,6 +212,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
     ehi = faultaddress;
     elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
+
+    if (dirty) {
+        // Bitwise And / Not
+        elo &= ~TLBLO_DIRTY;
+    }
+    
     DEBUG(DB_THREADS,"Ran out of memory, faultAddress: %d | vaddress: %d \n", faultaddress, paddr);
     tlb_random(ehi, elo);
 
@@ -224,6 +240,7 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
+	as->as_loaded = false;
 
 	return as;
 }
@@ -342,7 +359,16 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-	(void)as;
+	as->as_loaded = true;
+
+    int spl = splhigh();
+
+    for (i=0; i<NUM_TLB; i++) {
+        tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
+    }
+
+    splx(spl);
+
 	return 0;
 }
 
