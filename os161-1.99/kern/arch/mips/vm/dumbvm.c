@@ -86,39 +86,38 @@ getppages(unsigned long npages)
 {
 	paddr_t addr;
 	spinlock_acquire(&stealmem_lock);
-	if (!physmap_ready) {
-		addr = ram_stealmem(npages);
-	}
-	else {
+
+	if (physmap_ready) {
 		bool record = false;
-		int start = 0;
+		int sidx = 0;
 
 		for (int i = 0; i < pageLoc; i++) {
 
 			if (allocator[i] == AVAILABLE) {
 
-				if (!record) {
-					start = i;
+			    if (((unsigned) i - sidx == npages)) {
+                    for (unsigned int j = 0; j < npages; j++) {
+                        allocator[sidx + j] = ALLOC_POISON;
+                    }
+                    allocator[sidx] = npages;
+
+                    addr = elo + (sidx * PAGE_SIZE);
+			    }
+
+				else if (!record) {
+					sidx = i;
 					record = true;
 				}
-				else if ((unsigned) i - start == npages) {
 
-					for (unsigned int j = 0; j < npages; j++) {
-						allocator[start + j] = ALLOC_POISON;
-					}
-					allocator[start] = npages;
-
-					addr = elo + (start * PAGE_SIZE);
-				}
-
-			}
-			else {
+			} else {
 				record = false;
 			}
 
 		}
+	} else {
+	    addr = ram_stealmem(npages);
 	}
-	
+
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
