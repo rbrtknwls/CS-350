@@ -37,7 +37,6 @@
 #include <mips/tlb.h>
 #include <addrspace.h>
 #include <vm.h>
-#include <syscall.h>
 
 /*
  * Dumb MIPS-only "VM system" that is intended to only be just barely
@@ -67,13 +66,13 @@ getppages(unsigned long npages)
 	spinlock_acquire(&stealmem_lock);
 
 	addr = ram_stealmem(npages);
-	
+
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
 
 /* Allocate/free some kernel-space virtual pages */
-vaddr_t 
+vaddr_t
 alloc_kpages(int npages)
 {
 	paddr_t pa;
@@ -84,7 +83,7 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
-void 
+void
 free_kpages(vaddr_t addr)
 {
 	/* nothing - leak the memory. */
@@ -123,7 +122,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
-		    sys__exit(EFAULT);
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 		break;
@@ -173,7 +171,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
         if (as->as_loaded) {
-            dirty = true;
+    //        dirty = true;
         }
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
@@ -202,7 +200,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
         if (dirty) {
             // Bitwise And / Not
-            elo &= ~TLBLO_DIRTY;
+       //     elo &= ~TLBLO_DIRTY;
         }
 
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
@@ -216,7 +214,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
     if (dirty) {
         // Bitwise And / Not
-        elo &= ~TLBLO_DIRTY;
+    //    elo &= ~TLBLO_DIRTY;
     }
 
     DEBUG(DB_THREADS,"Ran out of memory, faultAddress: %d | vaddress: %d \n", faultaddress, paddr);
@@ -286,7 +284,7 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 		 int readable, int writeable, int executable)
 {
-	size_t npages; 
+	size_t npages;
 
 	/* Align the region. First, the base... */
 	sz += vaddr & ~(vaddr_t)PAGE_FRAME;
@@ -349,7 +347,7 @@ as_prepare_load(struct addrspace *as)
 	if (as->as_stackpbase == 0) {
 		return ENOMEM;
 	}
-	
+
 	as_zero_region(as->as_pbase1, as->as_npages1);
 	as_zero_region(as->as_pbase2, as->as_npages2);
 	as_zero_region(as->as_stackpbase, DUMBVM_STACKPAGES);
@@ -361,7 +359,6 @@ int
 as_complete_load(struct addrspace *as)
 {
 	as->as_loaded = true;
-
     int spl = splhigh();
 
     for (int i=0; i<NUM_TLB; i++) {
