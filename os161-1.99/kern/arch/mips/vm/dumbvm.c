@@ -217,7 +217,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         // Bitwise And / Not
         elo &= ~TLBLO_DIRTY;
     }
-    
+
     DEBUG(DB_THREADS,"Ran out of memory, faultAddress: %d | vaddress: %d \n", faultaddress, paddr);
     tlb_random(ehi, elo);
 
@@ -363,7 +363,7 @@ as_complete_load(struct addrspace *as)
 
     int spl = splhigh();
 
-    for (i=0; i<NUM_TLB; i++) {
+    for (int i=0; i<NUM_TLB; i++) {
         tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
     }
 
