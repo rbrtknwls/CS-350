@@ -51,8 +51,8 @@
 
 int *allocator;
 bool physmap_ready = false;
-int pageLoc;
-int arrLength;
+int pageLoc, arrLength;
+paddr_t ehi, elo;
 
 /*
  * Wrap rma_stealmem in a spinlock.
@@ -61,8 +61,6 @@ static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
 void putppages(paddr_t paddr) {
     if (physmap_ready) {
-        paddr_t ehi, elo;
-        tlb_read(&ehi, &elo, i);
 
         spinlock_acquire(&stealmem_lock);
 
@@ -78,7 +76,6 @@ void putppages(paddr_t paddr) {
 void
 vm_bootstrap(void)
 {
-    paddr_t ehi, elo;
     ram_getsize(&elo, &ehi);
     allocator = PADDR_TO_KVADDR(elo);
 
