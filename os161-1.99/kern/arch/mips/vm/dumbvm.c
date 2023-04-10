@@ -60,6 +60,22 @@ paddr_t ehi, elo;
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
 void putppages(paddr_t paddr) {
+	if (!physmap_ready) {
+		return;
+	}
+	else {
+		int nungus = (paddr - elo) / PAGE_SIZE;
+		spinlock_acquire(&stealmem_lock);
+		int npages = allocator[nungus];
+		for (int i = 0; i < npages; i++) {
+			allocator[nungus + i] = AVAILABLE;
+		}
+		spinlock_release(&stealmem_lock);
+	}
+}
+
+/*
+void putppages(paddr_t paddr) {
     if (physmap_ready) {
 
         spinlock_acquire(&stealmem_lock);
@@ -70,8 +86,7 @@ void putppages(paddr_t paddr) {
         }
         spinlock_release(&stealmem_lock);
     }
-}
-
+}*/
 
 void
 vm_bootstrap(void)
@@ -92,6 +107,27 @@ vm_bootstrap(void)
 
 	physmap_ready = true;
 }
+
+/*
+void
+vm_bootstrap(void)
+{
+	ram_getsize(&elo, &ehi);
+	allocator = (int *) PADDR_TO_KVADDR(elo);
+	pageLoc = (ehi - elo) / PAGE_SIZE;
+	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
+
+	for (int i = 0; i < pageLoc; i++) {
+		if (i < array_size) {
+			allocator[i] = ALLOC_POISON;
+		}
+		else {
+			allocator[i] = AVAILABLE;
+		}
+	}
+
+	physmap_ready = true;
+}*/
 
 
 /*static
