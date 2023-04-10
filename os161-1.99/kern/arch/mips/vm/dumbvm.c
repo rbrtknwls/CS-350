@@ -139,6 +139,9 @@ getppages(unsigned long npages)
 {
 	paddr_t addr;
 	spinlock_acquire(&stealmem_lock);
+
+	addr = ram_stealmem(npages);
+	/*
 	if (!physmap_ready) {
 		addr = ram_stealmem(npages);
 	}
@@ -174,7 +177,7 @@ getppages(unsigned long npages)
 		}
 		spinlock_release(&stealmem_lock);
 		return (paddr_t) NULL;
-	}
+	}*/
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
