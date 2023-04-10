@@ -76,21 +76,21 @@ void putppages(paddr_t paddr) {
 void
 vm_bootstrap(void)
 {
-    ram_getsize(&elo, &ehi);
-    allocator = (int *) PADDR_TO_KVADDR(elo);
+	ram_getsize(&elo, &ehi);
+	physmap = (int *) PADDR_TO_KVADDR(elo);
+	page_num = (ehi - elo) / PAGE_SIZE;
+	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
 
-    pageLoc = (ehi - elo) / PAGE_SIZE;
-    arrLength = (sizeof(int) * pageLoc) / PAGE_SIZE;
+	for (int i = 0; i < page_num; i++) {
+		if (i < array_size) {
+			allocator[i] = ALLOC_POISON;
+		}
+		else {
+			allocator[i] = AVAILABLE;
+		}
+	}
 
-    for (int i = 0; i < pageLoc; i++) {
-        if (i < arrLength) {
-            allocator[i] = ALLOC_POISON;
-        } else {
-            allocator[i] = AVAILABLE;
-        }
-    }
-
-    physmap_ready = true;
+	physmap_ready = true;
 }
 
 
