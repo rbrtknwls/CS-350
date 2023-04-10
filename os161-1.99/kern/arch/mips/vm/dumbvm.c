@@ -201,7 +201,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		if (is_dirty) {
+		if (IAmDirty) {
 			elo &= ~TLBLO_DIRTY;
 		}
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
@@ -213,7 +213,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
 	ehi = faultaddress;
 	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-	if (is_dirty) {
+	if (IAmDirty) {
 	    DEBUG(DB_THREADS,"Is dirty ehi: %d, elo: %d. \n", ehi, elo);
 		elo &= ~TLBLO_DIRTY;
 	}
