@@ -116,8 +116,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	faultaddress &= PAGE_FRAME;
 
-	DEBUG(DB_VM, "dumbvm: fault: 0x%x\n", faultaddress);
-
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
 		sys__exit(EFAULT);
@@ -204,7 +202,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		if (IAmDirty) {
 			elo &= ~TLBLO_DIRTY;
 		}
-		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
 		return 0;
@@ -214,7 +211,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	ehi = faultaddress;
 	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
 	if (IAmDirty) {
-	    DEBUG(DB_THREADS,"Is dirty ehi: %d, elo: %d. \n", ehi, elo);
 		elo &= ~TLBLO_DIRTY;
 	}
 
