@@ -358,14 +358,15 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-	as->as_loaded = true;
+	/*as->as_loaded = true;
     int spl = splhigh();
 
     for (int i=0; i<NUM_TLB; i++) {
         tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
     }
 
-    splx(spl);
+    splx(spl);*/
+    (void) as
 
 	return 0;
 }
