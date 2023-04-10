@@ -36,6 +36,7 @@
 #include <current.h>
 #include <mips/tlb.h>
 #include <addrspace.h>
+#include <syscall.h>
 #include <vm.h>
 
 /*
@@ -45,16 +46,37 @@
 
 /* under dumbvm, always have 48k of user stack */
 #define DUMBVM_STACKPAGES    12
+#define ALLOC_POISON 0x12345678
+#define AVAILABLE 0x87654321
 
 /*
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
+int *physmap;
+bool physmap_ready = false;
+paddr_t ehi, elo;
+int page_num;
+
 void
 vm_bootstrap(void)
 {
-	/* Do nothing. */
+	ram_getsize(&elo, &ehi);
+	physmap = PADDR_TO_KVADDR(elo);
+	page_num = (ehi - elo) / PAGE_SIZE;
+	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
+
+	for (int i = 0; i < page_num; i++) {
+		if (i < array_size) {
+			physmap[i] = ALLOC_POISON;
+		}
+		else {
+			physmap[i] = AVAILABLE;
+		}
+	}
+
+	physmap_ready = true;
 }
 
 static
@@ -62,11 +84,45 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-
 	spinlock_acquire(&stealmem_lock);
+	if (!physmap_ready) {
+		addr = ram_stealmem(npages);
+	}
+	else {
+		bool record = false;
+		int start = 0;
 
-	addr = ram_stealmem(npages);
+		for (int i = 0; i < page_num; i++) {
 
+			if (physmap[i] == AVAILABLE) {
+
+				if (!record) {
+					start = i;
+					record = true;
+				}
+				else if (i - start == npages) {
+
+					for (int j = 0; j < npages; j++) {
+						physmap[start + j] = ALLOC_POISON;
+					}
+					physmap[start] = npages;
+
+					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
+
+					addr = elo + (start * PAGE_SIZE);
+					spinlock_release(&stealmem_lock);
+					return addr;
+				}
+
+			}
+			else {
+				record = false;
+			}
+
+		}
+		spinlock_release(&stealmem_lock);
+		return NULL;
+	}
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
@@ -83,12 +139,25 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
+void putppages(paddr_t paddr) {
+	if (!physmap_ready) {
+		return;
+	}
+	else {
+		int nungus = (paddr - elo) / PAGE_SIZE;
+		spinlock_acquire(&stealmem_lock);
+		int npages = physmap[nungus];
+		for (int i = 0; i < npages; i++) {
+			physmap[nungus + i] = AVAILABLE;
+		}
+		spinlock_release(&stealmem_lock);
+	}
+}
+
 void
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */
-
-	(void)addr;
+	putppages(KVADDR_TO_PADDR(addr));
 }
 
 void
@@ -113,7 +182,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	uint32_t ehi, elo;
 	struct addrspace *as;
 	int spl;
-	bool dirty;
 
 	faultaddress &= PAGE_FRAME;
 
@@ -121,7 +189,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
-		/* We always create pages read-write, so we can't get this */
+		sys__exit(EFAULT);
+		// /* We always create pages read-write, so we can't get this */
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 		break;
@@ -168,21 +237,38 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	stackbase = USERSTACK - DUMBVM_STACKPAGES * PAGE_SIZE;
 	stacktop = USERSTACK;
 
+	bool is_dirty = false;
+
+	// if (as->as_loaded) {
+	// 	elo &= ~TLBLO_DIRTY;
+	// }
+
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
-        if (as->as_loaded) {
-    //        dirty = true;
-        }
+		if (as->as_loaded) {
+			is_dirty = true;
+		}
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
+		// if (as->as_loaded) {
+		// 	elo &= ~TLBLO_DIRTY;
+		// }
 	}
 	else if (faultaddress >= stackbase && faultaddress < stacktop) {
 		paddr = (faultaddress - stackbase) + as->as_stackpbase;
+		// if (as->as_loaded) {
+		// 	elo &= ~TLBLO_DIRTY;
+		// }
 	}
 	else {
 		return EFAULT;
 	}
+
+	// bool is_dirty = false;
+	// if (as->as_loaded) {
+	// 	is_dirty = true;
+	// }
 
 	/* make sure it's page-aligned */
 	KASSERT((paddr & PAGE_FRAME) == paddr);
@@ -197,31 +283,25 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-
-        if (dirty) {
-            // Bitwise And / Not
-       //     elo &= ~TLBLO_DIRTY;
-        }
-
+		if (is_dirty) {
+			elo &= ~TLBLO_DIRTY;
+		}
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
 		return 0;
 	}
 
-    ehi = faultaddress;
-    elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-
-    if (dirty) {
-        // Bitwise And / Not
-    //    elo &= ~TLBLO_DIRTY;
-    }
-
-    DEBUG(DB_THREADS,"Ran out of memory, faultAddress: %d | vaddress: %d \n", faultaddress, paddr);
-    tlb_random(ehi, elo);
-
+	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
+	ehi = faultaddress;
+	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
+	if (is_dirty) {
+		elo &= ~TLBLO_DIRTY;
+	}
+	DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
+	tlb_random(ehi, elo);
 	splx(spl);
-	return EFAULT;
+	return 0;
 }
 
 struct addrspace *
@@ -247,6 +327,9 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
+	putppages(as->as_pbase2);
+	putppages(as->as_stackpbase);
+	putppages(as->as_pbase1);
 	kfree(as);
 }
 
@@ -360,11 +443,9 @@ as_complete_load(struct addrspace *as)
 {
 	int spl = splhigh();
 	as->as_loaded = true;
-
 	for (int i=0; i<NUM_TLB; i++) {
 		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
 	}
-	
 	splx(spl);
 	return 0;
 }
