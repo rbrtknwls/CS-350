@@ -184,8 +184,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	faultaddress &= PAGE_FRAME;
 
-	DEBUG(DB_VM, "dumbvm: fault: 0x%x\n", faultaddress);
-
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
 		sys__exit(EFAULT);
@@ -236,38 +234,25 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	stackbase = USERSTACK - DUMBVM_STACKPAGES * PAGE_SIZE;
 	stacktop = USERSTACK;
 
-	bool is_dirty = false;
+	bool IAmDirty = false;
 
-	// if (as->as_loaded) {
-	// 	elo &= ~TLBLO_DIRTY;
-	// }
 
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
 		if (as->as_loaded) {
-			is_dirty = true;
+			IAmDirty = true;
 		}
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
-		// if (as->as_loaded) {
-		// 	elo &= ~TLBLO_DIRTY;
-		// }
 	}
 	else if (faultaddress >= stackbase && faultaddress < stacktop) {
 		paddr = (faultaddress - stackbase) + as->as_stackpbase;
-		// if (as->as_loaded) {
-		// 	elo &= ~TLBLO_DIRTY;
-		// }
 	}
 	else {
 		return EFAULT;
 	}
 
-	// bool is_dirty = false;
-	// if (as->as_loaded) {
-	// 	is_dirty = true;
-	// }
 
 	/* make sure it's page-aligned */
 	KASSERT((paddr & PAGE_FRAME) == paddr);
@@ -282,10 +267,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		if (is_dirty) {
+		if (IAmDirty) {
 			elo &= ~TLBLO_DIRTY;
 		}
-		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
 		return 0;
@@ -294,10 +278,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
 	ehi = faultaddress;
 	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-	if (is_dirty) {
+	if (IAmDirty) {
 		elo &= ~TLBLO_DIRTY;
 	}
-	DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
+
 	tlb_random(ehi, elo);
 	splx(spl);
 	return 0;
