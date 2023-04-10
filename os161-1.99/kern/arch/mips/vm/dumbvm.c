@@ -94,7 +94,7 @@ vm_bootstrap(void)
 }
 
 
-static
+/*static
 paddr_t
 getppages(unsigned long npages)
 {
@@ -128,6 +128,54 @@ getppages(unsigned long npages)
 
 	    }
 
+	}
+	spinlock_release(&stealmem_lock);
+	return addr;
+}*/
+
+static
+paddr_t
+getppages(unsigned long npages)
+{
+	paddr_t addr;
+	spinlock_acquire(&stealmem_lock);
+	if (!physmap_ready) {
+		addr = ram_stealmem(npages);
+	}
+	else {
+		bool record = false;
+		int start = 0;
+
+		for (int i = 0; i < page_num; i++) {
+
+			if (physmap[i] == AVAILABLE) {
+
+				if (!record) {
+					start = i;
+					record = true;
+				}
+				else if (i - start == npages) {
+
+					for (int j = 0; j < npages; j++) {
+						physmap[start + j] = ALLOC_POISON;
+					}
+					physmap[start] = npages;
+
+					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
+
+					addr = elo + (start * PAGE_SIZE);
+					spinlock_release(&stealmem_lock);
+					return addr;
+				}
+
+			}
+			else {
+				record = false;
+			}
+
+		}
+		spinlock_release(&stealmem_lock);
+		return NULL;
 	}
 	spinlock_release(&stealmem_lock);
 	return addr;
