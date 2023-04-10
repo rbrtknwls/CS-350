@@ -55,7 +55,7 @@
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
-int *physmap;
+unsigned int *physmap;
 bool physmap_ready = false;
 paddr_t ehi, elo;
 int page_num;
@@ -64,7 +64,7 @@ void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
-	physmap = PADDR_TO_KVADDR(elo);
+	physmap = (int*) PADDR_TO_KVADDR(elo);
 	page_num = (ehi - elo) / PAGE_SIZE;
 	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
 
@@ -101,14 +101,12 @@ getppages(unsigned long npages)
 					start = i;
 					record = true;
 				}
-				else if (i - start == npages) {
+				else if ((unsigned) i - start == npages) {
 
-					for (int j = 0; j < npages; j++) {
+					for (unsigned int j = 0; j < npages; j++) {
 						physmap[start + j] = ALLOC_POISON;
 					}
 					physmap[start] = npages;
-
-					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
 
 					addr = elo + (start * PAGE_SIZE);
 					spinlock_release(&stealmem_lock);
@@ -122,7 +120,7 @@ getppages(unsigned long npages)
 
 		}
 		spinlock_release(&stealmem_lock);
-		return NULL;
+		return (paddr_t) NULL;
 	}
 	spinlock_release(&stealmem_lock);
 	return addr;
