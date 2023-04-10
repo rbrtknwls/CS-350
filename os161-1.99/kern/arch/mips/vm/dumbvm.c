@@ -97,7 +97,7 @@ getppages(unsigned long npages)
 
 		for (int i = 0; i < page_num; i++) {
 
-			if (physmap[i] == AVAILABLE) {
+			if ((unsigned) physmap[i] == AVAILABLE) {
 
 				if (!record) {
 					start = i;
@@ -122,7 +122,7 @@ getppages(unsigned long npages)
 
 		}
 		spinlock_release(&stealmem_lock);
-		return NULL;
+		return (paddr_t) NULL;
 	}
 	spinlock_release(&stealmem_lock);
 	return addr;
