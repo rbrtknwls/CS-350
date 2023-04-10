@@ -64,7 +64,7 @@ void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
-	physmap = (int*) PADDR_TO_KVADDR(elo);
+	physmap = (unsigned int*) PADDR_TO_KVADDR(elo);
 	page_num = (ehi - elo) / PAGE_SIZE;
 	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
 
