@@ -143,7 +143,7 @@ void putppages(paddr_t paddr) {
 		spinlock_acquire(&stealmem_lock);
 		int idx = (paddr - elo) / PAGE_SIZE;
 		int numPages = physmap[idx];
-		for (int i = 0; i < npages; i++) {
+		for (int i = 0; i < numPages; i++) {
 			physmap[idx + i] = AVAILABLE;
 		}
 		spinlock_release(&stealmem_lock);
