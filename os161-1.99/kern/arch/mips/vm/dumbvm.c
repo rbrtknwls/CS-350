@@ -36,19 +36,17 @@
 #include <current.h>
 #include <mips/tlb.h>
 #include <addrspace.h>
-#include <vm.h>
 #include <syscall.h>
+#include <vm.h>
+
+
 /*
  * Dumb MIPS-only "VM system" that is intended to only be just barely
  * enough to struggle off the ground.
  */
 
 /* under dumbvm, always have 48k of user stack */
-
 #define DUMBVM_STACKPAGES    12
-/*#define ALLOC_POISON  0x22332233
-#define AVAILABLE 0x33223322*/
-
 #define ALLOC_POISON 0x12345678
 #define AVAILABLE 0x87654321
 
@@ -66,7 +64,7 @@ void
 vm_bootstrap(void)
 {
 	ram_getsize(&elo, &ehi);
-	physmap = (int *) PADDR_TO_KVADDR(elo);
+	physmap = PADDR_TO_KVADDR(elo);
 	page_num = (ehi - elo) / PAGE_SIZE;
 	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
 
@@ -97,18 +95,20 @@ getppages(unsigned long npages)
 
 		for (int i = 0; i < page_num; i++) {
 
-			if ((unsigned) physmap[i] == AVAILABLE) {
+			if (physmap[i] == AVAILABLE) {
 
 				if (!record) {
 					start = i;
 					record = true;
 				}
-				else if ((unsigned) i - start == npages) {
+				else if (i - start == npages) {
 
-					for (unsigned int j = 0; j < npages; j++) {
+					for (int j = 0; j < npages; j++) {
 						physmap[start + j] = ALLOC_POISON;
 					}
 					physmap[start] = npages;
+
+					int array_size = ((page_num * sizeof(int)) / PAGE_SIZE) + 1;
 
 					addr = elo + (start * PAGE_SIZE);
 					spinlock_release(&stealmem_lock);
@@ -122,13 +122,23 @@ getppages(unsigned long npages)
 
 		}
 		spinlock_release(&stealmem_lock);
-		return (paddr_t) NULL;
+		return NULL;
 	}
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
 
-
+/* Allocate/free some kernel-space virtual pages */
+vaddr_t
+alloc_kpages(int npages)
+{
+	paddr_t pa;
+	pa = getppages(npages);
+	if (pa==0) {
+		return 0;
+	}
+	return PADDR_TO_KVADDR(pa);
+}
 
 void putppages(paddr_t paddr) {
 	if (!physmap_ready) {
@@ -145,21 +155,10 @@ void putppages(paddr_t paddr) {
 	}
 }
 
-/* Allocate/free some kernel-space virtual pages */
-vaddr_t
-alloc_kpages(int npages)
-{
-	paddr_t pa;
-	getppages(npages);
-
-	return PADDR_TO_KVADDR(pa);
-}
-
 void
 free_kpages(vaddr_t addr)
 {
 	putppages(KVADDR_TO_PADDR(addr));
-
 }
 
 void
@@ -186,6 +185,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	int spl;
 
 	faultaddress &= PAGE_FRAME;
+
+	DEBUG(DB_VM, "dumbvm: fault: 0x%x\n", faultaddress);
 
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
@@ -237,25 +238,38 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	stackbase = USERSTACK - DUMBVM_STACKPAGES * PAGE_SIZE;
 	stacktop = USERSTACK;
 
-	bool IAmDirty = false;
+	bool is_dirty = false;
 
+	// if (as->as_loaded) {
+	// 	elo &= ~TLBLO_DIRTY;
+	// }
 
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
 		if (as->as_loaded) {
-			IAmDirty = true;
+			is_dirty = true;
 		}
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
+		// if (as->as_loaded) {
+		// 	elo &= ~TLBLO_DIRTY;
+		// }
 	}
 	else if (faultaddress >= stackbase && faultaddress < stacktop) {
 		paddr = (faultaddress - stackbase) + as->as_stackpbase;
+		// if (as->as_loaded) {
+		// 	elo &= ~TLBLO_DIRTY;
+		// }
 	}
 	else {
 		return EFAULT;
 	}
 
+	// bool is_dirty = false;
+	// if (as->as_loaded) {
+	// 	is_dirty = true;
+	// }
 
 	/* make sure it's page-aligned */
 	KASSERT((paddr & PAGE_FRAME) == paddr);
@@ -270,9 +284,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		if (IAmDirty) {
+		if (is_dirty) {
 			elo &= ~TLBLO_DIRTY;
 		}
+		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
 		return 0;
@@ -281,10 +296,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
 	ehi = faultaddress;
 	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-	if (IAmDirty) {
+	if (is_dirty) {
 		elo &= ~TLBLO_DIRTY;
 	}
-
+	DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 	tlb_random(ehi, elo);
 	splx(spl);
 	return 0;
@@ -313,9 +328,9 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
-    putppages(as->as_pbase2);
-    putppages(as->as_stackpbase);
-    putppages(as->as_pbase1);
+	putppages(as->as_pbase2);
+	putppages(as->as_stackpbase);
+	putppages(as->as_pbase1);
 	kfree(as);
 }
 
@@ -429,11 +444,9 @@ as_complete_load(struct addrspace *as)
 {
 	int spl = splhigh();
 	as->as_loaded = true;
-
 	for (int i=0; i<NUM_TLB; i++) {
 		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
 	}
-
 	splx(spl);
 	return 0;
 }
