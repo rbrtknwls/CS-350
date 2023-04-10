@@ -303,6 +303,9 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
+    putppages(as->as_pbase2);
+    putppages(as->as_stackpbase);
+    putppages(as->as_pbase1);
 	kfree(as);
 }
 
