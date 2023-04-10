@@ -66,7 +66,7 @@ void putppages(paddr_t paddr) {
 
         int val = (paddr - elo) / PAGE_SIZE;
         for (int i = 0; i < allocator[val]; i++) {
-            physmap[val + i] = AVAILABLE;
+            allocator[val + i] = AVAILABLE;
         }
         spinlock_release(&stealmem_lock);
     }
