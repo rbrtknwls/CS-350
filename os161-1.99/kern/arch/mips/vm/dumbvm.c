@@ -76,7 +76,7 @@ void putppages(paddr_t paddr) {
 void
 vm_bootstrap(void)
 {
-    ram_getsize(&elo, &ehi);
+    /*ram_getsize(&elo, &ehi);
     allocator = (int *) PADDR_TO_KVADDR(elo);
 
     pageLoc = (ehi - elo) / PAGE_SIZE;
@@ -90,7 +90,7 @@ vm_bootstrap(void)
         }
     }
 
-    physmap_ready = true;
+    physmap_ready = true;*/
 }
 
 
