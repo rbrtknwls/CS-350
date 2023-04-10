@@ -139,15 +139,12 @@ alloc_kpages(int npages)
 }
 
 void putppages(paddr_t paddr) {
-	if (!physmap_ready) {
-		return;
-	}
-	else {
-		int nungus = (paddr - elo) / PAGE_SIZE;
+	if (physmap_ready) {
 		spinlock_acquire(&stealmem_lock);
-		int npages = physmap[nungus];
+		int idx = (paddr - elo) / PAGE_SIZE;
+		int numPages = physmap[idx];
 		for (int i = 0; i < npages; i++) {
-			physmap[nungus + i] = AVAILABLE;
+			physmap[idx + i] = AVAILABLE;
 		}
 		spinlock_release(&stealmem_lock);
 	}
