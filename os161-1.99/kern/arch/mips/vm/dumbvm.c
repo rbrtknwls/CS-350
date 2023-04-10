@@ -79,9 +79,9 @@ vm_bootstrap(void)
 	ram_getsize(&elo, &ehi);
 	allocator = (int *) PADDR_TO_KVADDR(elo);
 	pageLoc = (ehi - elo) / PAGE_SIZE;
-	int array_size = (page_num * sizeof(int)) / PAGE_SIZE;
+	int array_size = (pageLoc * sizeof(int)) / PAGE_SIZE;
 
-	for (int i = 0; i < page_num; i++) {
+	for (int i = 0; i < pageLoc; i++) {
 		if (i < array_size) {
 			allocator[i] = ALLOC_POISON;
 		}
