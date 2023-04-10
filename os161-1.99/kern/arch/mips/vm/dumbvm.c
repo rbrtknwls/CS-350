@@ -44,29 +44,94 @@
  */
 
 /* under dumbvm, always have 48k of user stack */
+
 #define DUMBVM_STACKPAGES    12
+#define ALLOC_POISON  0x22332233
+#define AVAILABLE 0x33223322
+
+int *allocator;
+bool physmap_ready = false;
+int pageLoc;
+int arrLength;
 
 /*
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
+void putppages(paddr_t paddr) {
+    if (physmap_ready) {
+        paddr_t ehi, elo;
+        tlb_read(&ehi, &elo, i);
+
+        spinlock_acquire(&stealmem_lock);
+
+        int val = (paddr - elo) / PAGE_SIZE;
+        for (int i = 0; i < allocator[val]; i++) {
+            physmap[val + i] = AVAILABLE;
+        }
+        spinlock_release(&stealmem_lock);
+    }
+}
+
+
 void
 vm_bootstrap(void)
 {
-	/* Do nothing. */
+    paddr_t ehi, elo;
+    ram_getsize(&elo, &ehi);
+    allocator = PADDR_TO_KVADDR(elo);
+
+    pageLoc = (ehi - elo) / PAGE_SIZE;
+    arrLength = (sizeof(int) * pageLoc);
+
+    for (int i = 0; i < pageLoc; i++) {
+        if (i < arr_size) {
+            allocator[i] = ALLOC_POISON;
+        } else {
+            allocator[i] = AVAILABLE;
+        }
+    }
+
+    physmap_ready = true;
 }
+
 
 static
 paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-
 	spinlock_acquire(&stealmem_lock);
+    if (!physmap_ready){
+	    addr = ram_stealmem(npages);
+	} else {
 
-	addr = ram_stealmem(npages);
+	    int startingIdx = 0;
+	    bool foundValue = false;
 
+	    for (int i = 0; i < pageLoc; i++) {
+
+            if (allocator[i] == AVAILABLE) {
+                if (foundValue) {
+                    for (int x = 0; x < npages; x++) {
+                        allocator[startingIdx + x] = ALLOC_POISON;
+                    }
+                    allocator[startingIdx] = npages;
+
+                    addr = elo + (startingIdx * PAGE_SIZE);
+                } else {
+                    startingIdx = i;
+                    foundValue = true;
+                }
+            } else {
+                foundValue = false;
+            }
+
+
+	    }
+
+	}
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
@@ -86,9 +151,8 @@ alloc_kpages(int npages)
 void
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */
+	putppages(KVADDR_TO_PADDR(addr));
 
-	(void)addr;
 }
 
 void
